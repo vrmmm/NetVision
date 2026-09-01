@@ -1,6 +1,6 @@
 # 📡 NetVision - Kurumsal Ağ Yönetim Platformu
 
-**NetVision**, Manavgat Belediyesi'nin merkezi ağ altyapısını izlemek, yönetmek ve görselleştirmek için tasarlanmış kapsamlı bir ağ yönetim ve izleme platformudur. Sistem, 8 katlı yö[...]
+**NetVision**, Manavgat Belediyesi'nin merkezi ağ altyapısını izlemek, yönetmek ve görselleştirmek için tasarlanmış kapsamlı bir ağ yönetim ve izleme platformudur.
 
 ---
 
@@ -79,43 +79,6 @@ NetVision/
 | **Veritabanı** | SQL (Design Phase) |
 | **Ağ Protokolleri** | ICMP (Ping), SNMP (planned), TCP/IP |
 | **Simülasyon** | Cisco Packet Tracer |
-
----
-
-## 🚀 Başlarken
-
-### Gereksinimler
-- **.NET 10.0 SDK** veya sonrası
-- **Visual Studio 2022** (Community veya üzeri) VEYA Visual Studio Code
-- **SQL Server** (ileri aşamalar için)
-
-### Kurulum Adımları
-
-1. **Repository'yi klonlayın:**
-   ```bash
-   git clone https://github.com/vrmmm/NetVision.git
-   cd NetVision
-   ```
-
-2. **Proje dizinine gidin:**
-   ```bash
-   cd NetVision.NetworkManagement/NetVision.NetworkManagement
-   ```
-
-3. **Bağımlılıkları yükleyin:**
-   ```bash
-   dotnet restore
-   ```
-
-4. **Uygulamayı çalıştırın:**
-   ```bash
-   dotnet run
-   ```
-
-5. **Tarayıcıda açın:**
-   ```
-   https://localhost:5001
-   ```
 
 ---
 
@@ -281,12 +244,6 @@ Bu proje öğrenme amacıyla geliştirilmektedir. Katkılar için lütfen:
 - **LinkedIn:** [Evrim Avcı](https://www.linkedin.com/in/evrim-avcı-08b020340?utm_source=share_via&utm_content=profile&utm_medium=member_android)
 - **E-mail:** [evrimmavcii@gmail.com](mailto:evrimmavcii@gmail.com)
 - **Repository:** [github.com/vrmmm/NetVision](https://github.com/vrmmm/NetVision)
-
----
-
-## 📄 Lisans
-
-Bu proje açık kaynak olup, [MIT License](LICENSE) altında yayımlanmıştır.
 
 ---
 
