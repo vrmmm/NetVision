@@ -1,0 +1,189 @@
+@*
+  ==============================================================================
+  NETVISION - İNTERAKTİF AĞ TOPOLOJİSİ (Topology.cshtml)
+  Manavgat Belediyesi 8 Katlı Akıllı Bina Ağ Topolojisi Haritası
+  ==============================================================================
+  Bu sayfa hiyerarşik ağ mimarisini görselleştirir:
+  - Seviye 1: ISP WAN Yönlendiricisi (ISP-RTR)
+  - Seviye 2: Cisco ASA 5506-X Güvenlik Duvarı (FW-01)
+  - Seviye 3: Cisco Catalyst 3560 L3 Omurga Switch (CORE-01)
+  - Seviye 4: Sistem Odası Sunucu Çiftliği (VLAN 30)
+  - Seviye 5: 8 Katın Catalyst 2960 Erişim Switchleri (VLAN 10)
+  - Düğümlere tıklandığında cihazın MAC, IP ve port detayları açılır.
+  ==============================================================================
+*@
+
+@model List<NetVision.NetworkManagement.Models.NetworkDevice>
+@{
+    ViewData["Title"] = "İnteraktif Ağ Topolojisi";
+}
+
+@* --------------------------------------------------------------------------
+   1. SAYFA BAŞLIĞI VE TOPOLOJİ BİLGİSİ
+   Sitede Ne İşe Yarar: Sayfa amacını ve etkileşim ipucunu açıklar.
+--------------------------------------------------------------------------- *@
+<div class="page-header-row">
+    <div>
+        <h2 class="page-header-title">Hiyerarşik Ağ Topolojisi</h2>
+        <p class="page-header-subtitle">Cisco 3-Katmanlı Model: WAN ➔ Güvenlik Duvarı ➔ Omurga (Core) ➔ Dağıtım ve Erişim Katmanı</p>
+    </div>
+    <div class="page-header-actions">
+        <span class="badge badge-vlan">İpucu: Detaylar için düğümlere tıklayınız</span>
+    </div>
+</div>
+
+<div class="topology-container-card">
+
+    @* --------------------------------------------------------------------------
+       2. SEVİYE 1: ISP WAN DIŞ AĞ BAĞLANTISI
+       Sitede Ne İşe Yarar: İnternet Servis Sağlayıcı router düğümünü gösterir.
+    --------------------------------------------------------------------------- *@
+    <div style="text-align: center; margin-bottom: 8px;">
+        <span style="font-size: 11px; font-weight: 700; color: #8E8E8E; text-transform: uppercase; letter-spacing: 1px;">Dış Ağ & WAN Seviyesi</span>
+    </div>
+    <div class="topology-grid-level">
+        <div class="topology-node-box" data-id="ISP-RTR">
+            <div class="node-icon-wrap">
+                <i class="ph-bold ph-globe"></i>
+            </div>
+            <div class="node-name">ISP-RTR</div>
+            <div class="node-ip">203.0.113.1 (WAN)</div>
+            <div style="margin-top: 6px;"><span class="badge badge-online">Aktif</span></div>
+        </div>
+    </div>
+
+    @* --------------------------------------------------------------------------
+       3. SEVİYE 2: CISCO ASA 5506-X GÜVENLİK DUVARI
+       Sitede Ne İşe Yarar: Kurumun dış dünya ile iç ağ arasındaki güvenlik sınırını temsil eder.
+    --------------------------------------------------------------------------- *@
+    <div style="text-align: center; margin-bottom: 8px;">
+        <span style="font-size: 11px; font-weight: 700; color: #8E8E8E; text-transform: uppercase; letter-spacing: 1px;">Güvenlik Duvarı & Dynamic PAT</span>
+    </div>
+    <div class="topology-grid-level">
+        <div class="topology-node-box" data-id="FW-01">
+            <div class="node-icon-wrap" style="border-color: #8E8E8E;">
+                <i class="ph-bold ph-shield-check"></i>
+            </div>
+            <div class="node-name">FW-01 (ASA 5506-X)</div>
+            <div class="node-ip">10.10.10.3 • 203.0.113.2</div>
+            <div style="margin-top: 6px;"><span class="badge badge-online">Inside/Outside Aktif</span></div>
+        </div>
+    </div>
+
+    @* --------------------------------------------------------------------------
+       4. SEVİYE 3: CORE-01 OMURGA SWITCH (CATALYST 3560)
+       Sitede Ne İşe Yarar: Inter-VLAN yönlendirmesi ve DHCP sunucusu olan merkezi omurga anahtarı.
+    --------------------------------------------------------------------------- *@
+    <div style="text-align: center; margin-bottom: 8px;">
+        <span style="font-size: 11px; font-weight: 700; color: #8E8E8E; text-transform: uppercase; letter-spacing: 1px;">Merkezi Omurga (Core Switching & L3 Routing)</span>
+    </div>
+    <div class="topology-grid-level">
+        <div class="topology-node-box selected" data-id="CORE-01" style="min-width: 260px;">
+            <div class="node-icon-wrap" style="background-color: #2B2B2B; border-color: #FFFFFF;">
+                <i class="ph-bold ph-cpu"></i>
+            </div>
+            <div class="node-name" style="font-size: 15px;">CORE-01 (Catalyst 3560)</div>
+            <div class="node-ip">10.10.10.1 (SVI Gateway)</div>
+            <div style="margin-top: 6px; display: flex; gap: 4px; justify-content: center;">
+                <span class="badge badge-vlan">VLAN 10-60</span>
+                <span class="badge badge-online">DHCP Server</span>
+            </div>
+        </div>
+    </div>
+
+    @* --------------------------------------------------------------------------
+       5. SEVİYE 4: SİSTEM ODASI SUNUCU ÇİFTLİĞİ (VLAN 30)
+       Sitede Ne İşe Yarar: Active Directory, DNS, Web, Veritabanı ve NetVision sunucularını listeler.
+    --------------------------------------------------------------------------- *@
+    <div style="text-align: center; margin-bottom: 8px;">
+        <span style="font-size: 11px; font-weight: 700; color: #8E8E8E; text-transform: uppercase; letter-spacing: 1px;">Sistem Odası Sunucu Çiftliği (VLAN 30 - SERVERS)</span>
+    </div>
+    <div class="topology-grid-level" style="flex-wrap: wrap;">
+        <div class="topology-node-box" data-id="SRV-01">
+            <div class="node-icon-wrap"><i class="ph-bold ph-hard-drive"></i></div>
+            <div class="node-name">SRV-01 (AD / DNS)</div>
+            <div class="node-ip">10.10.30.10</div>
+        </div>
+        <div class="topology-node-box" data-id="SRV-02">
+            <div class="node-icon-wrap"><i class="ph-bold ph-browsers"></i></div>
+            <div class="node-name">SRV-02 (Web Portal)</div>
+            <div class="node-ip">10.10.30.11</div>
+        </div>
+        <div class="topology-node-box" data-id="SRV-03">
+            <div class="node-icon-wrap"><i class="ph-bold ph-database"></i></div>
+            <div class="node-name">SRV-03 (Veritabanı)</div>
+            <div class="node-ip">10.10.30.12</div>
+        </div>
+        <div class="topology-node-box" data-id="SRV-04">
+            <div class="node-icon-wrap"><i class="ph-bold ph-floppy-disk"></i></div>
+            <div class="node-name">SRV-04 (Yedekleme)</div>
+            <div class="node-ip">10.10.30.13</div>
+        </div>
+        <div class="topology-node-box" data-id="SRV-05">
+            <div class="node-icon-wrap"><i class="ph-bold ph-envelope-simple"></i></div>
+            <div class="node-name">SRV-05 (E-Posta)</div>
+            <div class="node-ip">10.10.30.14</div>
+        </div>
+        <div class="topology-node-box" data-id="SRV-06">
+            <div class="node-icon-wrap"><i class="ph-bold ph-gauge"></i></div>
+            <div class="node-name">SRV-06 (NetVision)</div>
+            <div class="node-ip">10.10.30.15</div>
+        </div>
+    </div>
+
+    @* --------------------------------------------------------------------------
+       6. SEVİYE 5: 8 KATIN ERİŞİM SWITCHLERİ (CATALYST 2960)
+       Sitede Ne İşe Yarar: 8 katlı binanın kat switchlerini ve bağlı uç birimleri temsil eder.
+    --------------------------------------------------------------------------- *@
+    <div style="text-align: center; margin-bottom: 8px;">
+        <span style="font-size: 11px; font-weight: 700; color: #8E8E8E; text-transform: uppercase; letter-spacing: 1px;">8 Katlı Bina Erişim Switchleri (VLAN 10 - Trunk Bağlantılı)</span>
+    </div>
+    <div class="topology-grid-level" style="flex-wrap: wrap;">
+        <div class="topology-node-box" data-id="SW-M2-01">
+            <div class="node-icon-wrap"><i class="ph-bold ph-squares-four"></i></div>
+            <div class="node-name">SW-M2-01</div>
+            <div class="node-ip">Kat -2 (10.10.10.4)</div>
+        </div>
+        <div class="topology-node-box" data-id="SW-M1-01">
+            <div class="node-icon-wrap"><i class="ph-bold ph-squares-four"></i></div>
+            <div class="node-name">SW-M1-01</div>
+            <div class="node-ip">Kat -1 (10.10.10.5)</div>
+        </div>
+        <div class="topology-node-box" data-id="SW-GF-01">
+            <div class="node-icon-wrap"><i class="ph-bold ph-squares-four"></i></div>
+            <div class="node-name">SW-GF-01</div>
+            <div class="node-ip">Zemin Kat (10.10.10.6)</div>
+        </div>
+        <div class="topology-node-box" data-id="SW-01-01">
+            <div class="node-icon-wrap"><i class="ph-bold ph-squares-four"></i></div>
+            <div class="node-name">SW-01-01</div>
+            <div class="node-ip">Kat 1 (10.10.10.7)</div>
+        </div>
+        <div class="topology-node-box" data-id="SW-02-01">
+            <div class="node-icon-wrap"><i class="ph-bold ph-squares-four"></i></div>
+            <div class="node-name">SW-02-01</div>
+            <div class="node-ip">Kat 2 (10.10.10.8)</div>
+        </div>
+        <div class="topology-node-box" data-id="SW-03-01">
+            <div class="node-icon-wrap"><i class="ph-bold ph-squares-four"></i></div>
+            <div class="node-name">SW-03-01</div>
+            <div class="node-ip">Kat 3 (10.10.10.9)</div>
+        </div>
+        <div class="topology-node-box" data-id="SW-03-02">
+            <div class="node-icon-wrap"><i class="ph-bold ph-squares-four"></i></div>
+            <div class="node-name">SW-03-02</div>
+            <div class="node-ip">Kat 3 (10.10.10.10)</div>
+        </div>
+        <div class="topology-node-box" data-id="SW-04-01">
+            <div class="node-icon-wrap"><i class="ph-bold ph-squares-four"></i></div>
+            <div class="node-name">SW-04-01</div>
+            <div class="node-ip">Kat 4 (10.10.10.11)</div>
+        </div>
+        <div class="topology-node-box" data-id="SW-05-01">
+            <div class="node-icon-wrap"><i class="ph-bold ph-squares-four"></i></div>
+            <div class="node-name">SW-05-01</div>
+            <div class="node-ip">Kat 5 (10.10.10.12)</div>
+        </div>
+    </div>
+
+</div>

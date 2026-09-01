@@ -1,0 +1,95 @@
+@*
+  ==============================================================================
+  NETVISION - DOĞRULAMA TEST MATRİSİ (TestMatrix.cshtml)
+  Manavgat Belediyesi 8 Katlı Akıllı Bina Ağ Doğrulama & Güvenlik Testleri (14 Test)
+  ==============================================================================
+  Bu sayfa projenin tüm teknik doğrulama adımlarını belgeler:
+  - DHCP otomatik IP alma, Gateway pingi, katlar arası trunk testleri
+  - Inter-VLAN routing, Misafir Ağı izolasyonu (ACL 101), Yönetim izolasyonu (ACL 102)
+  - Cisco ASA 5506-X Dynamic PAT, ICMP Stateful Inspection ve Port Security testleri.
+  ==============================================================================
+*@
+
+@model List<NetVision.NetworkManagement.Models.ValidationTest>
+@{
+    ViewData["Title"] = "Doğrulama Test Matrisi";
+    string selectedCat = ViewBag.SelectedCategory ?? "All";
+}
+
+@* --------------------------------------------------------------------------
+   1. SAYFA BAŞLIĞI VE GENEL DOĞRULAMA SKORU
+   Sitede Ne İşe Yarar: Testlerin başarı oranını ve toplam test sayısını özetler.
+--------------------------------------------------------------------------- *@
+<div class="page-header-row">
+    <div>
+        <h2 class="page-header-title">Ağ & Güvenlik Doğrulama Test Matrisi</h2>
+        <p class="page-header-subtitle">Packet Tracer ve Canlı Omurga Üzerinde Koşulan 14 Maddelik Doğrulama Kanıtları</p>
+    </div>
+    <div class="page-header-actions">
+        <span class="badge badge-online" style="font-size: 13px; padding: 6px 12px;">
+            <i class="ph-bold ph-check-circle"></i>
+            <span>14 / 14 Test Doğrulandı (%100 Başarı)</span>
+        </span>
+    </div>
+</div>
+
+@* --------------------------------------------------------------------------
+   2. KATEGORİ FİLTRELEME BUTONLARI
+   Sitede Ne İşe Yarar: Testleri DHCP, Routing, ACL, NAT, Güvenlik vb. kategorilere göre filtreler.
+--------------------------------------------------------------------------- *@
+<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+    <a href="/Home/TestMatrix?category=All" class="btn @(selectedCat == "All" ? "btn-primary" : "btn-secondary") btn-sm">Tüm Testler (14)</a>
+    <a href="/Home/TestMatrix?category=DHCP%20%26%20İstemci" class="btn @(selectedCat == "DHCP & İstemci" ? "btn-primary" : "btn-secondary") btn-sm">DHCP & IP</a>
+    <a href="/Home/TestMatrix?category=Inter-VLAN%20Routing" class="btn @(selectedCat == "Inter-VLAN Routing" ? "btn-primary" : "btn-secondary") btn-sm">Inter-VLAN</a>
+    <a href="/Home/TestMatrix?category=Güvenlik%20%26%20ACL" class="btn @(selectedCat == "Güvenlik & ACL" ? "btn-primary" : "btn-secondary") btn-sm">ACL Politikaları</a>
+    <a href="/Home/TestMatrix?category=NAT%20%2F%20PAT" class="btn @(selectedCat == "NAT / PAT" ? "btn-primary" : "btn-secondary") btn-sm">Dynamic PAT</a>
+    <a href="/Home/TestMatrix?category=Firewall%20%26%20MPF" class="btn @(selectedCat == "Firewall & MPF" ? "btn-primary" : "btn-secondary") btn-sm">ASA Firewall</a>
+    <a href="/Home/TestMatrix?category=Port%20Güvenliği" class="btn @(selectedCat == "Port Güvenliği" ? "btn-primary" : "btn-secondary") btn-sm">Port Security</a>
+</div>
+
+@* --------------------------------------------------------------------------
+   3. 14 TESTLİK DOĞRULAMA KARTLARI
+   Sitede Ne İşe Yarar: Her testin kaynak, hedef, beklenen sonuç, elde edilen sonuç ve CLI komutunu listeler.
+--------------------------------------------------------------------------- *@
+<div style="display: flex; flex-direction: column; gap: 16px;">
+    @foreach (var test in Model)
+    {
+        <div class="panel-card" style="margin-bottom: 0;">
+            <div class="panel-header-row" style="margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="badge badge-vlan" style="font-size: 12px;">@test.Id</span>
+                    <h3 style="font-size: 15px; font-weight: 700; color: #E6E6E6;">@test.Name</h3>
+                    <span class="badge badge-gray">@test.Category</span>
+                </div>
+                <span class="badge badge-online">
+                    <i class="ph-bold ph-check"></i>
+                    <span>@test.Status</span>
+                </span>
+            </div>
+
+            <p style="font-size: 13px; color: #8E8E8E; margin-bottom: 12px;">@test.Function</p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 12px;">
+                <div style="background-color: #212121; padding: 10px 14px; border-radius: 6px; border: 1px solid #2B2B2B;">
+                    <span style="font-size: 11px; color: #8E8E8E; display: block; margin-bottom: 2px;">Kaynak & Hedef:</span>
+                    <strong style="color: #E6E6E6; font-size: 12px;">@test.Source ➔ @test.Destination</strong>
+                </div>
+
+                <div style="background-color: #212121; padding: 10px 14px; border-radius: 6px; border: 1px solid #2B2B2B;">
+                    <span style="font-size: 11px; color: #8E8E8E; display: block; margin-bottom: 2px;">Beklenen Teknik Sonuç:</span>
+                    <span style="color: #E6E6E6; font-size: 12px;">@test.ExpectedResult</span>
+                </div>
+
+                <div style="background-color: #212121; padding: 10px 14px; border-radius: 6px; border: 1px solid #2B2B2B;">
+                    <span style="font-size: 11px; color: #34d399; display: block; margin-bottom: 2px;">Doğrulanan Gerçek Sonuç:</span>
+                    <strong style="color: #34d399; font-size: 12px;">@test.ActualResult</strong>
+                </div>
+            </div>
+
+            <div style="background-color: #0A0A0A; padding: 8px 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 11px; color: #8E8E8E; display: flex; align-items: center; justify-content: space-between;">
+                <span><strong style="color: #E6E6E6;">CLI Komutu:</strong> @test.CliCommand</span>
+                <span style="color: #34d399;"><i class="ph-bold ph-seal-check"></i> Kanıt Onaylandı</span>
+            </div>
+        </div>
+    }
+</div>

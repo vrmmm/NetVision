@@ -1,0 +1,249 @@
+@*
+  ==============================================================================
+  NETVISION KURUMSAL AĞ YÖNETİM PLATFORMU - ANA DÜZEN ŞABLONU (_Layout.cshtml)
+  Manavgat Belediyesi 8 Katlı Akıllı Bina Ağ Yönetim Sistemi
+  ==============================================================================
+  Bu dosya projenin tüm sayfalarında ortak olan:
+  - Sayfa başlığı (<head>), meta etiketleri ve font yüklemeleri
+  - Sabit üst gezinme çubuğu (Header) ve Manavgat Belediyesi kurumsal logosu
+  - Sol yan navigasyon menüsü (Sidebar) ve sayfa yönlendirme linkleri
+  - Canlı ağ durumu göstergeleri ve modal detay pencerelerini içerir.
+  ==============================================================================
+*@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - NetVision | Manavgat Belediyesi</title>
+    
+    @* Google Fonts: Modern sans-serif Inter ve terminal monospace JetBrains Mono *@
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    @* Phosphor Icons Web Kütüphanesi *@
+    <script src="https://unpkg.com/@@phosphor-icons/web"></script>
+    
+    @* NetVision Özel Kurumsal CSS Stilleri (#0D0D0D, #2B2B2B, #8E8E8E, #E6E6E6) *@
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app-container">
+        
+        @* --------------------------------------------------------------------------
+           1. ÜST BAŞLIK (HEADER)
+           Sitede Ne İşe Yarar: Kurum logosu, genel ağ durumu özeti ve hızlı arıza tetikleme
+        --------------------------------------------------------------------------- *@
+        <header class="app-header">
+            <div class="header-left">
+                <a href="/Home/Index" class="logo-link">
+                    <div class="logo-badge-box">
+                        <i class="ph-bold ph-shield-check"></i>
+                    </div>
+                    <div class="logo-titles">
+                        <h1>NET<span>VISION</span></h1>
+                        <span class="org-subtitle">Manavgat Belediyesi</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="header-center">
+                <div class="status-pill">
+                    <span class="status-indicator-dot"></span>
+                    <span>Omurga Durumu: <strong>Optimum & Güvenli</strong></span>
+                    <span class="sidebar-mini-badge">48 Gün Uptime</span>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <button class="btn btn-danger btn-sm simulate-fault-btn" data-fault="link_down" title="Test amaçlı ağ arızası oluşturur">
+                    <i class="ph-bold ph-warning-octagon"></i>
+                    <span>Hata Simüle Et</span>
+                </button>
+                
+                <a href="/Home/PingTool" class="btn btn-primary btn-sm">
+                    <i class="ph-bold ph-broadcast"></i>
+                    <span>Canlı Teşhis</span>
+                </a>
+
+                <div class="admin-badge">
+                    <div class="admin-avatar">
+                        <i class="ph-bold ph-user-gear"></i>
+                    </div>
+                    <div class="admin-text">
+                        <span class="admin-name">Ağ Yöneticisi</span>
+                        <span class="admin-vlan">VLAN 10 • 10.10.10.1</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        @* --------------------------------------------------------------------------
+           2. ANA GÖVDE VE SOL MENÜ (BODY & SIDEBAR)
+           Sitede Ne İşe Yarar: Tüm modüllere (Dashboard, Topoloji, Envanter vb.) hızlı erişim sağlar.
+        --------------------------------------------------------------------------- *@
+        <div class="app-body-wrapper">
+            <aside class="app-sidebar">
+                <div>
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-group-title">YÖNETİM & İZLEME</div>
+                        
+                        <a href="/Home/Index" class="nav-link-btn @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
+                            <div class="nav-left-content">
+                                <i class="ph-bold ph-house nav-icon"></i>
+                                <span>Karşılama</span>
+                            </div>
+                        </a>
+
+                        <a href="/Home/Dashboard" class="nav-link-btn @(ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" ? "active" : "")">
+                            <div class="nav-left-content">
+                                <i class="ph-bold ph-chart-polar nav-icon"></i>
+                                <span>Dashboard</span>
+                            </div>
+                            <span class="sidebar-mini-badge">Canlı</span>
+                        </a>
+
+                        <a href="/Home/Topology" class="nav-link-btn @(ViewContext.RouteData.Values["Action"]?.ToString() == "Topology" ? "active" : "")">
+                            <div class="nav-left-content">
+                                <i class="ph-bold ph-tree-structure nav-icon"></i>
+                                <span>Ağ Topolojisi</span>
+                            </div>
+                        </a>
+
+                        <a href="/Home/Inventory" class="nav-link-btn @(ViewContext.RouteData.Values["Action"]?.ToString() == "Inventory" ? "active" : "")">
+                            <div class="nav-left-content">
+                                <i class="ph-bold ph-hard-drives nav-icon"></i>
+                                <span>Cihaz Envanteri (CMDB)</span>
+                            </div>
+                            <span class="sidebar-mini-badge">157</span>
+                        </a>
+
+                        <a href="/Home/PortMatrix" class="nav-link-btn @(ViewContext.RouteData.Values["Action"]?.ToString() == "PortMatrix" ? "active" : "")">
+                            <div class="nav-left-content">
+                                <i class="ph-bold ph-squares-four nav-icon"></i>
+                                <span>VLAN & Port Matrisi</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-group-title">GÜVENLİK & TEŞHİS</div>
+
+                        <a href="/Home/PingTool" class="nav-link-btn @(ViewContext.RouteData.Values["Action"]?.ToString() == "PingTool" ? "active" : "")">
+                            <div class="nav-left-content">
+                                <i class="ph-bold ph-broadcast nav-icon"></i>
+                                <span>Ping / ICMP Teşhis</span>
+                            </div>
+                        </a>
+
+                        <a href="/Home/TestMatrix" class="nav-link-btn @(ViewContext.RouteData.Values["Action"]?.ToString() == "TestMatrix" ? "active" : "")">
+                            <div class="nav-left-content">
+                                <i class="ph-bold ph-check-square-offset nav-icon"></i>
+                                <span>Doğrulama Testleri</span>
+                            </div>
+                            <span class="sidebar-mini-badge">14/14</span>
+                        </a>
+
+                        <a href="/Home/CiscoConfig" class="nav-link-btn @(ViewContext.RouteData.Values["Action"]?.ToString() == "CiscoConfig" ? "active" : "")">
+                            <div class="nav-left-content">
+                                <i class="ph-bold ph-terminal-window nav-icon"></i>
+                                <span>Cisco CLI Konfigürasyon</span>
+                            </div>
+                        </a>
+
+                        <a href="/Home/Alarms" class="nav-link-btn @(ViewContext.RouteData.Values["Action"]?.ToString() == "Alarms" ? "active" : "")">
+                            <div class="nav-left-content">
+                                <i class="ph-bold ph-bell-ringing nav-icon"></i>
+                                <span>Alarmlar ve Olaylar</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                @* Sol menü altı Omurga özet kutusu *@
+                <div class="sidebar-core-box">
+                    <div class="core-box-header">
+                        <span>CORE-01 Omurga</span>
+                        <i class="ph-bold ph-cpu"></i>
+                    </div>
+                    <div class="core-stat-line">
+                        <span>CPU Yükü</span>
+                        <strong>12.4%</strong>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-bar-fill" style="width: 12.4%;"></div>
+                    </div>
+                    <div class="core-stat-line">
+                        <span>Aktif VLAN</span>
+                        <span class="badge badge-online">6/6 Aktif</span>
+                    </div>
+                </div>
+            </aside>
+
+            @* --------------------------------------------------------------------------
+               3. DİNAMİK SAYFA İÇERİĞİ (MAIN VIEWPORT)
+            --------------------------------------------------------------------------- *@
+            <main class="app-main-content">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    @* --------------------------------------------------------------------------
+       4. CİHAZ DETAY MODALI (POPUP)
+       Sitede Ne İşe Yarar: Bir cihaza tıklandığında açılan özet bilgi penceresidir.
+    --------------------------------------------------------------------------- *@
+    <div class="modal-overlay" id="deviceDetailModal">
+        <div class="modal-content-box">
+            <div class="modal-header">
+                <div>
+                    <h3 id="modalDevName" style="font-size: 16px; font-weight: 700; color: #E6E6E6;">Cihaz Adı</h3>
+                    <span id="modalDevId" style="font-size: 11px; font-family: var(--font-mono); color: #8E8E8E;">DEV-ID</span>
+                </div>
+                <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #2B2B2B; padding-bottom: 8px;">
+                    <span style="color: #8E8E8E;">Cihaz Türü:</span>
+                    <strong id="modalDevType" style="color: #E6E6E6;">-</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #2B2B2B; padding-bottom: 8px;">
+                    <span style="color: #8E8E8E;">IP Adresi:</span>
+                    <strong id="modalDevIp" style="font-family: var(--font-mono); color: #E6E6E6;">-</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #2B2B2B; padding-bottom: 8px;">
+                    <span style="color: #8E8E8E;">MAC Adresi:</span>
+                    <span id="modalDevMac" style="font-family: var(--font-mono); color: #8E8E8E;">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #2B2B2B; padding-bottom: 8px;">
+                    <span style="color: #8E8E8E;">VLAN Segmenti:</span>
+                    <strong id="modalDevVlan" style="color: #E6E6E6;">-</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #2B2B2B; padding-bottom: 8px;">
+                    <span style="color: #8E8E8E;">Konum / Kat:</span>
+                    <span id="modalDevFloor" style="color: #E6E6E6;">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #2B2B2B; padding-bottom: 8px;">
+                    <span style="color: #8E8E8E;">Bağlı Olduğu Port:</span>
+                    <span id="modalDevPort" style="font-family: var(--font-mono); color: #E6E6E6;">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #2B2B2B; padding-bottom: 8px;">
+                    <span style="color: #8E8E8E;">Durum:</span>
+                    <span id="modalDevStatus" class="badge badge-online">Online</span>
+                </div>
+                <div>
+                    <span style="color: #8E8E8E; display: block; margin-bottom: 4px;">Açıklama / İşlev:</span>
+                    <p id="modalDevDesc" style="color: #E6E6E6; font-size: 12px; background-color: #2B2B2B; padding: 8px; border-radius: 6px;">-</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* JavaScript İstemci Motoru *@
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

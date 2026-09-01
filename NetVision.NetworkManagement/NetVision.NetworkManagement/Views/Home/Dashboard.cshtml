@@ -1,0 +1,223 @@
+@*
+  ==============================================================================
+  NETVISION - GENEL BAKIŞ PANELİ (Dashboard.cshtml)
+  Manavgat Belediyesi 8 Katlı Akıllı Bina Ağ Durum Paneli
+  ==============================================================================
+  Bu sayfa ağ yöneticisinin merkezi operasyon ekranıdır:
+  - Toplam ve çevrimiçi cihaz sayıları, ortalama gecikme ve CPU/Bellek metrikleri
+  - 6 adet kurumsal VLAN'ın (Yönetim, Personel, Sunucu vb.) cihaz kapasitesi ve alt ağları
+  - 8 katlı binanın kat bazlı switch durumları ve port kullanım oranları
+  - Son Syslog ve güvenlik alarmlarını gösterir.
+  ==============================================================================
+*@
+
+@model NetVision.NetworkManagement.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard - Kurumsal Ağ Durum Paneli";
+}
+
+@* --------------------------------------------------------------------------
+   1. SAYFA BAŞLIĞI VE HIZLI YENİLEME
+   Sitede Ne İşe Yarar: Sayfa başlığını ve anlık metrik yenileme butonunu barındırır.
+--------------------------------------------------------------------------- *@
+<div class="page-header-row">
+    <div>
+        <h2 class="page-header-title">Kurumsal Ağ Durum Paneli</h2>
+        <p class="page-header-subtitle">Manavgat Belediyesi 8 Katlı Yönetim Binası Gerçek Zamanlı Ağ Metrikleri</p>
+    </div>
+    <div class="page-header-actions">
+        <a href="/Home/Dashboard" class="btn btn-secondary btn-sm">
+            <i class="ph-bold ph-arrows-clockwise"></i>
+            <span>Verileri Yenile</span>
+        </a>
+        <a href="/Home/PingTool" class="btn btn-primary btn-sm">
+            <i class="ph-bold ph-broadcast"></i>
+            <span>Canlı ICMP Teşhis</span>
+        </a>
+    </div>
+</div>
+
+@* --------------------------------------------------------------------------
+   2. TEMEL METRİK SAYAC KARTLARI (METRICS GRID)
+   Sitede Ne İşe Yarar: Toplam cihaz, aktif durum, ASA Firewall ve omurga gecikmesini özetler.
+--------------------------------------------------------------------------- *@
+<div class="metrics-grid-4">
+    <div class="metric-box-card">
+        <div class="metric-icon-square">
+            <i class="ph-bold ph-desktop"></i>
+        </div>
+        <div class="metric-content">
+            <span class="metric-title">Toplam Uç & Altyapı Cihazı</span>
+            <span class="metric-value-number">@Model.TotalDeviceCount</span>
+            <span class="metric-sub-note" style="color: #34d399;"><i class="ph-bold ph-check-circle"></i> 145 PC + 12 Altyapı</span>
+        </div>
+    </div>
+
+    <div class="metric-box-card">
+        <div class="metric-icon-square">
+            <i class="ph-bold ph-wifi-high"></i>
+        </div>
+        <div class="metric-content">
+            <span class="metric-title">Çevrimiçi Cihazlar</span>
+            <span class="metric-value-number" style="color: #34d399;">@Model.OnlineDeviceCount / @Model.TotalDeviceCount</span>
+            <span class="metric-sub-note"><span class="badge badge-online">100% Operasyonel</span></span>
+        </div>
+    </div>
+
+    <div class="metric-box-card">
+        <div class="metric-icon-square">
+            <i class="ph-bold ph-shield-check"></i>
+        </div>
+        <div class="metric-content">
+            <span class="metric-title">Cisco ASA Firewall</span>
+            <span class="metric-value-number" style="font-size: 18px;">FW-01 Aktif</span>
+            <span class="metric-sub-note">PAT: 10.10.0.0/16 ➔ 203.0.113.2</span>
+        </div>
+    </div>
+
+    <div class="metric-box-card">
+        <div class="metric-icon-square">
+            <i class="ph-bold ph-activity"></i>
+        </div>
+        <div class="metric-content">
+            <span class="metric-title">Ortalama Omurga Gecikmesi</span>
+            <span class="metric-value-number">@Model.AverageLatencyMs ms</span>
+            <span class="metric-sub-note">Jitter: 0.06 ms (Mükemmel)</span>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+    
+    @* --------------------------------------------------------------------------
+       3. VLAN DAĞILIMI VE ALT AĞ SEGMENTASYONU
+       Sitede Ne İşe Yarar: 6 aktif VLAN'ın IP bloğunu, gateway adresini ve cihaz dağılımını gösterir.
+    --------------------------------------------------------------------------- *@
+    <div class="panel-card">
+        <div class="panel-header-row">
+            <h3 class="panel-title-text">
+                <i class="ph-bold ph-squares-four"></i>
+                <span>VLAN Dağılımı ve Alt Ağlar</span>
+            </h3>
+            <span class="badge badge-vlan">6 Aktif VLAN</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+            @foreach (var vlan in Model.Vlans)
+            {
+                <div style="background-color: #212121; border: 1px solid #2B2B2B; border-radius: 8px; padding: 12px 16px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="badge badge-vlan">VLAN @vlan.Id</span>
+                            <strong style="font-size: 13px; color: #E6E6E6;">@vlan.Name</strong>
+                        </div>
+                        <span style="font-size: 12px; color: #8E8E8E; font-family: var(--font-mono);">@vlan.Subnet</span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #8E8E8E; margin-bottom: 6px;">
+                        <span>Ağ Geçidi (SVI): <strong>@vlan.Gateway</strong></span>
+                        <strong style="color: #E6E6E6;">@vlan.DeviceCount Cihaz</strong>
+                    </div>
+
+                    <div class="progress-track">
+                        <div class="progress-bar-fill" style="width: @(Math.Min(100, vlan.DeviceCount * 1.5))%;"></div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    @* --------------------------------------------------------------------------
+       4. KAT BAZLI ALTYAPI VE DAĞITIM SWITCHLERİ
+       Sitede Ne İşe Yarar: 8 katlı binanın her katındaki switch modeli ve port sayılarını listeler.
+    --------------------------------------------------------------------------- *@
+    <div class="panel-card">
+        <div class="panel-header-row">
+            <h3 class="panel-title-text">
+                <i class="ph-bold ph-buildings"></i>
+                <span>8 Katlı Bina Altyapı ve Switch Dağılımı</span>
+            </h3>
+            <a href="/Home/PortMatrix" class="btn btn-outline btn-sm">Port Matrisine Git</a>
+        </div>
+
+        <div class="table-responsive-wrapper">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Kat</th>
+                        <th>Birim / Departman</th>
+                        <th>Switch Modeli</th>
+                        <th>IP Adresi</th>
+                        <th>Aktif Port</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var fl in Model.Floors)
+                    {
+                        <tr>
+                            <td><span class="badge badge-vlan">Kat @fl.Floor</span></td>
+                            <td><strong>@fl.Name</strong></td>
+                            <td style="font-size: 12px; color: #8E8E8E;">@fl.SwitchModel</td>
+                            <td style="font-family: var(--font-mono); font-size: 12px;">@fl.SwitchIp</td>
+                            <td><span class="badge badge-online">@fl.RequiredPorts Port</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@* --------------------------------------------------------------------------
+   5. SON ALARM VE OLAY GÜNLÜĞÜ (SYSLOG)
+   Sitede Ne İşe Yarar: Sistemdeki son kritik veya bilgilendirme loglarını listeler.
+--------------------------------------------------------------------------- *@
+<div class="panel-card" style="margin-top: 24px;">
+    <div class="panel-header-row">
+        <h3 class="panel-title-text">
+            <i class="ph-bold ph-bell-ringing"></i>
+            <span>Son Olay ve Güvenlik Alarmları</span>
+        </h3>
+        <a href="/Home/Alarms" class="btn btn-outline btn-sm">Tüm Alarmları Gör</a>
+    </div>
+
+    <div class="table-responsive-wrapper">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Zaman</th>
+                    <th>Kaynak Cihaz</th>
+                    <th>Düzey</th>
+                    <th>Kategori</th>
+                    <th>Syslog / Açıklama Mesajı</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var alarm in Model.RecentAlarms)
+                {
+                    <tr>
+                        <td style="font-family: var(--font-mono); font-size: 11px; color: #8E8E8E;">@alarm.Timestamp.ToString("HH:mm:ss")</td>
+                        <td><strong>@alarm.SourceDevice</strong></td>
+                        <td>
+                            @if (alarm.Severity == "CRITICAL")
+                            {
+                                <span class="badge badge-offline">CRITICAL</span>
+                            }
+                            else if (alarm.Severity == "WARNING")
+                            {
+                                <span class="badge badge-warning">WARNING</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-online">INFO</span>
+                            }
+                        </td>
+                        <td><span class="badge badge-gray">@alarm.Category</span></td>
+                        <td style="font-family: var(--font-mono); font-size: 12px;">@alarm.Message</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

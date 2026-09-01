@@ -1,0 +1,147 @@
+@*
+  ==============================================================================
+  NETVISION - CİHAZ ENVANTERİ & CMDB (Inventory.cshtml)
+  Manavgat Belediyesi 8 Katlı Akıllı Bina Cihaz Listesi (157 Cihaz)
+  ==============================================================================
+  Bu sayfa kurumun tüm ağ ve uç envanterini yönetir:
+  - Cihaz arama (İsim, IP, MAC, Departman, Port bazlı)
+  - Kat bazlı filtreleme (-2'den 5. kata kadar)
+  - VLAN bazlı filtreleme (VLAN 10, 20, 30, 40, 50, 60)
+  - Tek tıkla canlı ping başlatma veya detay modalı görüntüleme
+  ==============================================================================
+*@
+
+@model List<NetVision.NetworkManagement.Models.NetworkDevice>
+@{
+    ViewData["Title"] = "Cihaz Envanteri (CMDB)";
+    var floors = ViewBag.Floors as List<NetVision.NetworkManagement.Models.FloorSpec> ?? new();
+    var vlans = ViewBag.Vlans as List<NetVision.NetworkManagement.Models.VlanInfo> ?? new();
+    string selectedFloor = ViewBag.SelectedFloor ?? "All";
+    string selectedVlan = ViewBag.SelectedVlan ?? "All";
+    string search = ViewBag.Search ?? "";
+}
+
+@* --------------------------------------------------------------------------
+   1. SAYFA BAŞLIĞI VE SAYAC ROZETİ
+   Sitede Ne İşe Yarar: Envanterdeki toplam filtrelenmiş cihaz sayısını gösterir.
+--------------------------------------------------------------------------- *@
+<div class="page-header-row">
+    <div>
+        <h2 class="page-header-title">Cihaz Envanteri (CMDB)</h2>
+        <p class="page-header-subtitle">Manavgat Belediyesi 8 Katlı Akıllı Binasında Kayıtlı Tüm Ağ ve Uç Cihazlar</p>
+    </div>
+    <div class="page-header-actions">
+        <span class="badge badge-online" style="font-size: 13px; padding: 6px 12px;">
+            <i class="ph-bold ph-hard-drives"></i>
+            <span>@Model.Count Cihaz Listelendi</span>
+        </span>
+    </div>
+</div>
+
+@* --------------------------------------------------------------------------
+   2. FİLTRE VE ARAMA FORMU
+   Sitede Ne İşe Yarar: Kullanıcının cihaz adı, IP, MAC adresi, kat veya VLAN'a göre arama yapmasını sağlar.
+--------------------------------------------------------------------------- *@
+<div class="panel-card" style="margin-bottom: 20px; padding: 16px;">
+    <form method="get" action="/Home/Inventory" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+        <div style="flex: 1; min-width: 220px;">
+            <input type="text" name="search" class="form-control" placeholder="Cihaz Adı, IP, MAC veya Birim Ara..." value="@search" />
+        </div>
+
+        <div style="width: 180px;">
+            <select name="floor" class="form-select">
+                <option value="All">Tüm Katlar</option>
+                @foreach (var fl in floors)
+                {
+                    string fName = fl.Floor == "0" ? "Zemin Kat" : $"Kat {fl.Floor}";
+                    <option value="@fName" selected="@(selectedFloor == fName)">@fName (@fl.Name)</option>
+                }
+            </select>
+        </div>
+
+        <div style="width: 180px;">
+            <select name="vlan" class="form-select">
+                <option value="All">Tüm VLAN'lar</option>
+                @foreach (var vl in vlans)
+                {
+                    <option value="@vl.Id" selected="@(selectedVlan == vl.Id.ToString())">VLAN @vl.Id - @vl.Name</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="ph-bold ph-magnifying-glass"></i>
+            <span>Filtrele</span>
+        </button>
+
+        <a href="/Home/Inventory" class="btn btn-secondary">
+            <i class="ph-bold ph-arrow-counter-clockwise"></i>
+            <span>Sıfırla</span>
+        </a>
+    </form>
+</div>
+
+@* --------------------------------------------------------------------------
+   3. 157 CİHAZLIK CMDB ENVANTER TABLOSU
+   Sitede Ne İşe Yarar: Filtrelenmiş tüm cihazları ayrıntılı teknik sütunlarla listeler.
+--------------------------------------------------------------------------- *@
+<div class="panel-card">
+    <div class="table-responsive-wrapper">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Cihaz Kimliği</th>
+                    <th>Cihaz Adı / Model</th>
+                    <th>Tür</th>
+                    <th>IP Adresi</th>
+                    <th>MAC Adresi</th>
+                    <th>VLAN</th>
+                    <th>Kat / Birim</th>
+                    <th>Switch Portu</th>
+                    <th>Durum</th>
+                    <th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var dev in Model)
+                {
+                    <tr>
+                        <td style="font-family: var(--font-mono); font-weight: 700; color: #E6E6E6;">@dev.Id</td>
+                        <td>
+                            <strong>@dev.Name</strong>
+                            @if (!string.IsNullOrEmpty(dev.Description))
+                            {
+                                <div style="font-size: 11px; color: #8E8E8E;">@dev.Description</div>
+                            }
+                        </td>
+                        <td><span class="badge badge-gray">@dev.Type</span></td>
+                        <td style="font-family: var(--font-mono); font-size: 12px; color: #E6E6E6;">@dev.IpAddress</td>
+                        <td style="font-family: var(--font-mono); font-size: 11px; color: #8E8E8E;">@dev.MacAddress</td>
+                        <td><span class="badge badge-vlan">@dev.Vlan</span></td>
+                        <td>
+                            <div>@dev.Floor</div>
+                            <small style="color: #8E8E8E; font-size: 11px;">@dev.Department</small>
+                        </td>
+                        <td style="font-family: var(--font-mono); font-size: 11px;">@dev.Port</td>
+                        <td>
+                            <span class="badge @(dev.Status == "Online" ? "badge-online" : "badge-offline")">
+                                <span class="status-indicator-dot" style="width: 6px; height: 6px; display: inline-block;"></span>
+                                @dev.Status
+                            </span>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 6px;">
+                                <button class="btn btn-secondary btn-sm" onclick="showDeviceModal('@dev.Id')" title="Detay">
+                                    <i class="ph-bold ph-info"></i>
+                                </button>
+                                <a href="/Home/PingTool" class="btn btn-outline btn-sm" title="Ping Gönder">
+                                    <i class="ph-bold ph-broadcast"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

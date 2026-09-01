@@ -1,0 +1,117 @@
+@*
+  ==============================================================================
+  NETVISION - ALARM VE SYSLOG GÜNLÜĞÜ (Alarms.cshtml)
+  Manavgat Belediyesi 8 Katlı Akıllı Bina Canlı Olay Takip ve Hata Simülasyonu
+  ==============================================================================
+  Bu sayfa ağdaki tüm olayları ve alarmları yönetir:
+  - Kritik, uyarı ve bilgilendirme Syslog mesajlarını listeleme
+  - Test amaçlı ağ arızası (Port Down, Yüksek CPU, Port Security ihlali) simüle etme
+  - Alarmları temizleme ve sistem nominal durumunu doğrulama.
+  ==============================================================================
+*@
+
+@model List<NetVision.NetworkManagement.Models.AlarmLog>
+@{
+    ViewData["Title"] = "Alarmlar ve Olay Günlüğü";
+}
+
+@* --------------------------------------------------------------------------
+   1. SAYFA BAŞLIĞI VE SİMÜLASYON AKSİYONLARI
+   Sitede Ne İşe Yarar: Sayfa başlığı ile birlikte canlı arıza enjekte etme ve temizleme butonlarını sunar.
+--------------------------------------------------------------------------- *@
+<div class="page-header-row">
+    <div>
+        <h2 class="page-header-title">Alarmlar & Syslog Olay Günlüğü</h2>
+        <p class="page-header-subtitle">Ağ Cihazlarından Üretilen Canlı Güvenlik, Arayüz ve Sistem Olayları</p>
+    </div>
+    <div class="page-header-actions">
+        <button id="clearAlarmsBtn" class="btn btn-secondary btn-sm">
+            <i class="ph-bold ph-trash"></i>
+            <span>Alarmları Temizle</span>
+        </button>
+    </div>
+</div>
+
+@* --------------------------------------------------------------------------
+   2. HATA SİMÜLASYONU KONTROL PANELİ
+   Sitede Ne İşe Yarar: Ağ yöneticisinin test amaçlı farklı arıza tiplerini simüle etmesini sağlar.
+--------------------------------------------------------------------------- *@
+<div class="panel-card" style="margin-bottom: 20px; padding: 16px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+        <div>
+            <h4 style="font-size: 14px; font-weight: 700; color: #E6E6E6; display: flex; align-items: center; gap: 6px;">
+                <i class="ph-bold ph-warning-octagon" style="color: #fda4af;"></i>
+                <span>Canlı Ağ Arızası Simülasyonu</span>
+            </h4>
+            <p style="font-size: 12px; color: #8E8E8E; margin-top: 2px;">
+                Sistem alarm mekanizmasını test etmek için aşağıdaki senaryolardan birini tetikleyin:
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-danger btn-sm simulate-fault-btn" data-fault="link_down">
+                <i class="ph-bold ph-link-break"></i>
+                <span>Link Down (SW-03-01)</span>
+            </button>
+            <button class="btn btn-secondary btn-sm simulate-fault-btn" data-fault="high_cpu">
+                <i class="ph-bold ph-cpu"></i>
+                <span>Yüksek CPU (%92 CORE-01)</span>
+            </button>
+            <button class="btn btn-danger btn-sm simulate-fault-btn" data-fault="security_violation">
+                <i class="ph-bold ph-shield-warning"></i>
+                <span>Port Security İhlali</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+@* --------------------------------------------------------------------------
+   3. SYSLOG VE ALARM LİSTESİ TABLOSU
+   Sitede Ne İşe Yarar: Gerçekleşen olayları zaman damgası, kritiklik seviyesi ve mesajıyla listeler.
+--------------------------------------------------------------------------- *@
+<div class="panel-card">
+    <div class="table-responsive-wrapper">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Olay ID</th>
+                    <th>Zaman Damgası</th>
+                    <th>Kaynak Cihaz</th>
+                    <th>Kritiklik Seviyesi</th>
+                    <th>Kategori</th>
+                    <th>Syslog / Açıklama Mesajı</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var alarm in Model)
+                {
+                    <tr>
+                        <td style="font-family: var(--font-mono); font-weight: 700; color: #8E8E8E;">#@alarm.Id</td>
+                        <td style="font-family: var(--font-mono); font-size: 12px; color: #E6E6E6;">@alarm.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td><strong>@alarm.SourceDevice</strong></td>
+                        <td>
+                            @if (alarm.Severity == "CRITICAL")
+                            {
+                                <span class="badge badge-offline">CRITICAL</span>
+                            }
+                            else if (alarm.Severity == "WARNING")
+                            {
+                                <span class="badge badge-warning">WARNING</span>
+                            }
+                            else if (alarm.Severity == "SUCCESS")
+                            {
+                                <span class="badge badge-online">SUCCESS</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-gray">INFO</span>
+                            }
+                        </td>
+                        <td><span class="badge badge-vlan">@alarm.Category</span></td>
+                        <td style="font-family: var(--font-mono); font-size: 12px; color: #E6E6E6;">@alarm.Message</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

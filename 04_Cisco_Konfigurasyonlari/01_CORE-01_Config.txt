@@ -1,0 +1,196 @@
+! ==============================================================================
+! NETVISION - MANAVGAT BELEDIYESI 
+! CIHAZ: CORE-01 (Merkezi Multilayer Omurga Switch - Cisco Catalyst 3560/3650)
+! GOREVI: Inter-VLAN Routing, DHCP Sunucusu, L2/L3 Omurga ve Guvenlik ACL Yonetimi
+! ==============================================================================
+
+enable
+configure terminal
+
+! --- Temel Cihaz Ayarlari ---
+hostname CORE-01
+no ip domain-lookup
+ip domain-name netvision.local
+service password-encryption
+
+! --- Yonetici Kullanici ve Guvenlik Sifreleri ---
+username admin privilege 15 secret Cisco@123
+enable secret Cisco@123
+
+! --- Banner / Uyari Mesaji ---
+banner motd ^C
+===============================================================
+  NETVISION - MANAVGAT BELEDIYESI 
+  CORE-01 OMURGA SWITCH - YETKISIZ ERISIM KESINLIKLE YASAKTIR!
+===============================================================
+^C
+
+! --- Spanning-Tree Ayarlari (Omurga Primary Root) ---
+spanning-tree mode rapid-pvst
+spanning-tree vlan 10,20,30,40,50,60 root primary
+
+! --- VLAN Veritabani Tanimlari ---
+vlan 10
+ name MANAGEMENT
+!
+vlan 20
+ name USERS
+!
+vlan 30
+ name SERVERS
+!
+vlan 40
+ name SECURITY
+!
+vlan 50
+ name GUEST
+!
+vlan 60
+ name VOICE
+!
+exit
+
+! --- Layer 3 Routing (Inter-VLAN Yonlendirme) Aktiflestirme ---
+ip routing
+
+! --- DHCP Haric Tutulan IP Adresleri (Gateway ve Statik Cihazlar Icin) ---
+! VLAN 20 (USERS) - 10.10.20.1 ile 10.10.20.20 arasi statik/rezerv
+ip dhcp excluded-address 10.10.20.1 10.10.20.20
+ip dhcp excluded-address 10.10.20.201 10.10.20.254
+
+! VLAN 40 (SECURITY) - 10.10.40.1 ile 10.10.40.20 arasi statik/NVR rezerv
+ip dhcp excluded-address 10.10.40.1 10.10.40.20
+ip dhcp excluded-address 10.10.40.201 10.10.40.254
+
+! VLAN 50 (GUEST) - 10.10.50.1 ile 10.10.50.20 arasi rezerv
+ip dhcp excluded-address 10.10.50.1 10.10.50.20
+ip dhcp excluded-address 10.10.50.201 10.10.50.254
+
+! VLAN 60 (VOICE) - 10.10.60.1 ile 10.10.60.20 arasi IP PBX rezerv
+ip dhcp excluded-address 10.10.60.1 10.10.60.20
+ip dhcp excluded-address 10.10.60.201 10.10.60.254
+
+! --- DHCP Havuzlari (Otomatik IP Dagitimi) ---
+ip dhcp pool POOL_USERS
+   network 10.10.20.0 255.255.255.0
+   default-router 10.10.20.1
+   dns-server 10.10.30.10 8.8.8.8
+   lease 7 0 0
+!
+ip dhcp pool POOL_SECURITY
+   network 10.10.40.0 255.255.255.0
+   default-router 10.10.40.1
+   dns-server 10.10.30.10 8.8.8.8
+   lease 30 0 0
+!
+ip dhcp pool POOL_GUEST
+   network 10.10.50.0 255.255.255.0
+   default-router 10.10.50.1
+   dns-server 8.8.8.8 1.1.1.1
+   lease 1 0 0
+!
+ip dhcp pool POOL_VOICE
+   network 10.10.60.0 255.255.255.0
+   default-router 10.10.60.1
+   dns-server 10.10.30.10
+   option 150 ip 10.10.30.10
+   lease 14 0 0
+!
+
+! --- Guvenlik Erisim Kontrol Listeleri (Access-Lists - ACL) ---
+
+! ACL 101: GUEST IZOLASYONU (Misafir agi ic kurumsal aglara erisemez, sadece internete cikar)
+ip access-list extended ACL_GUEST_ISOLATION
+ remark *** Misafirlerin DNS (UDP 53) ve ICMP gateway erisimine izin ver ***
+ permit udp 10.10.50.0 0.0.0.255 any eq domain
+ permit icmp 10.10.50.0 0.0.0.255 host 10.10.50.1
+ remark *** Kurumsal Ic Aglara (10.10.0.0/16) Erisimi Engelle ***
+ deny ip 10.10.50.0 0.0.0.255 10.10.0.0 0.0.255.255
+ remark *** Diger Tum Dis Aglara / Internete Izin Ver ***
+ permit ip 10.10.50.0 0.0.0.255 any
+!
+
+! ACL 102: USERS GUVENLIGI (Kullanicilarin Yonetim VLAN 10 erisimini engelle, Sunucu ve Internet serbest)
+ip access-list extended ACL_USERS_RESTRICTION
+ remark *** Yonetim VLAN 10 Arayuzlerine Erisimi Engelle ***
+ deny ip 10.10.20.0 0.0.0.255 10.10.10.0 0.0.0.255
+ remark *** Sunucu, Kamera ve Internet Erisimine Izin Ver ***
+ permit ip 10.10.20.0 0.0.0.255 any
+!
+
+! --- SVI (Switch Virtual Interface - Default Gateway Arayuzleri) ---
+interface Vlan10
+ description YONETIM_AGI_GATEWAY
+ ip address 10.10.10.1 255.255.255.0
+ no shutdown
+!
+interface Vlan20
+ description KULLANICI_AGI_GATEWAY
+ ip address 10.10.20.1 255.255.255.0
+ ip access-group ACL_USERS_RESTRICTION in
+ no shutdown
+!
+interface Vlan30
+ description SUNUCU_AGI_GATEWAY
+ ip address 10.10.30.1 255.255.255.0
+ no shutdown
+!
+interface Vlan40
+ description GUVENLIK_KAMERA_GATEWAY
+ ip address 10.10.40.1 255.255.255.0
+ no shutdown
+!
+interface Vlan50
+ description MISAFIR_KABLOSUZ_GATEWAY
+ ip address 10.10.50.1 255.255.255.0
+ ip access-group ACL_GUEST_ISOLATION in
+ no shutdown
+!
+interface Vlan60
+ description SES_VOIP_GATEWAY
+ ip address 10.10.60.1 255.255.255.0
+ no shutdown
+!
+
+! --- Firewall Baglanti Portu (FW-01 Baglantisi) ---
+interface GigabitEthernet0/1
+ description BAGLANTI_TO_FW-01_INSIDE
+ switchport access vlan 10
+ switchport mode access
+ no shutdown
+!
+
+! --- Kat Erisim Switchleri Uplink Port Yapilandirmasi (Trunk Portlar) ---
+interface range GigabitEthernet0/2 - 10
+ description TRUNK_TO_ACCESS_SWITCHES
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,40,50,60
+ switchport nonegotiate
+ no shutdown
+!
+
+! --- Kullanilmayan Portlarin Kapatilmasi (Guvenlik) ---
+interface range GigabitEthernet0/11 - 24
+ description UNUSED_PORT_SHUTDOWN
+ shutdown
+!
+
+! --- Default Route (Dis Ag / Internet Trafigini Firewall'a Yonlendir) ---
+ip route 0.0.0.0 0.0.0.0 10.10.10.3
+
+! --- Konsol ve VTY Yonetim Erisim Ayarlari ---
+line con 0
+ exec-timeout 10 0
+ logging synchronous
+ login local
+!
+line vty 0 15
+ exec-timeout 10 0
+ logging synchronous
+ login local
+ transport input ssh telnet
+!
+
+end
+write memory

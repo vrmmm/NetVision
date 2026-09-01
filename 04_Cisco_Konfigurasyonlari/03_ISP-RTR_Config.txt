@@ -1,0 +1,77 @@
+! ==============================================================================
+! NETVISION - MANAVGAT BELEDIYESI
+! CIHAZ: ISP-RTR (Internet Servis Saglayici Router - Cisco 2911)
+! GOREVI: WAN / Internet Cikisi, Dis DNS/Web Sunucu Simulasyonu, Donus Yonlendirmesi
+! ==============================================================================
+
+enable
+configure terminal
+
+! --- Temel Cihaz Ayarlari ---
+hostname ISP-RTR
+no ip domain-lookup
+service password-encryption
+
+! --- Yonetici Kullanici ve Guvenlik Sifreleri ---
+username admin privilege 15 secret Cisco@123
+enable secret Cisco@123
+
+! --- Banner Mesaji ---
+banner motd ^C
+===============================================================
+  NETVISION - INTERNET SERVIS SAGLAYICI (ISP) OMURGA ROUTER
+  TEST VE SIMULASYON ORTAMI - YETKISIZ ERISIM YASAKTIR!
+===============================================================
+^C
+
+! --- Kurumsal Guvenlik Duvari (FW-01 Outside) WAN Baglantisi ---
+interface GigabitEthernet0/0
+ description WAN_BAGLANTISI_TO_FW-01_OUTSIDE
+ ip address 203.0.113.1 255.255.255.252
+ duplex auto
+ speed auto
+ no shutdown
+!
+
+! --- Simule Edilmis Genel Internet ve DNS / Web Sunuculari ---
+interface Loopback0
+ description SIMULE_INTERNET_DNS_SUNUCU_8.8.8.8
+ ip address 8.8.8.8 255.255.255.255
+ no shutdown
+!
+
+interface Loopback1
+ description SIMULE_INTERNET_WEB_SUNUCU_1.1.1.1
+ ip address 1.1.1.1 255.255.255.255
+ no shutdown
+!
+
+! --- Kullanilmayan Diger Arayuzlerin Kapatilmasi ---
+interface GigabitEthernet0/1
+ description UNUSED
+ shutdown
+!
+interface GigabitEthernet0/2
+ description UNUSED
+ shutdown
+!
+
+! --- Statik Donus Yonlendirmesi (Kurum Ic Aglarina Geri Donus Rotasi) ---
+! 10.10.0.0/16 trafiginin FW-01 dis IP'sine yonlendirilmesi
+ip route 10.10.0.0 255.255.0.0 203.0.113.2
+
+! --- Konsol ve VTY Erisim Ayarlari ---
+line con 0
+ exec-timeout 10 0
+ logging synchronous
+ login local
+!
+line vty 0 4
+ exec-timeout 10 0
+ logging synchronous
+ login local
+ transport input ssh telnet
+!
+
+end
+write memory

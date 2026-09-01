@@ -1,0 +1,89 @@
+@*
+  ==============================================================================
+  NETVISION - CISCO CLI KONFİGÜRASYON GÖRÜNTÜLEYİCİ (CiscoConfig.cshtml)
+  Manavgat Belediyesi 8 Katlı Akıllı Bina Cisco Cihaz Yapılandırma Dosyaları
+  ==============================================================================
+  Bu sayfa projedeki tüm Cisco cihazlarının çalışan konfigürasyonlarını içerir:
+  - CORE-01 Catalyst 3560 L3 Omurga Switch (VLAN, DHCP, SVI, Trunk, ACL)
+  - FW-01 ASA 5506-X Güvenlik Duvarı (Zones, Dynamic PAT, MPF, ICMP Inspection)
+  - ISP-RTR WAN Router (Dış Ağ Gateway, Loopback DNS 8.8.8.8)
+  - Access Switch Şablonu (Port Security, Voice VLAN, Spanning-Tree)
+  - Tek tıkla CLI konfigürasyonunu panoya kopyalama imkanı sağlar.
+  ==============================================================================
+*@
+
+@model NetVision.NetworkManagement.Models.CiscoConfigFile
+@{
+    ViewData["Title"] = "Cisco CLI Konfigürasyonları";
+    var configs = ViewBag.Configs as List<NetVision.NetworkManagement.Models.CiscoConfigFile> ?? new();
+    string activeKey = ViewBag.ActiveKey ?? "core01";
+}
+
+@* --------------------------------------------------------------------------
+   1. SAYFA BAŞLIĞI VE AKSİYON BUTONU
+   Sitede Ne İşe Yarar: Sayfa başlığı ve konfigürasyon metnini kopyalama butonunu sunar.
+--------------------------------------------------------------------------- *@
+<div class="page-header-row">
+    <div>
+        <h2 class="page-header-title">Cisco CLI Konfigürasyon Arşivi</h2>
+        <p class="page-header-subtitle">Manavgat Belediyesi Ağ Altyapısında Çalışan Cisco IOS ve ASA CLI Yapılandırmaları</p>
+    </div>
+    <div class="page-header-actions">
+        <button id="copyConfigBtn" class="btn btn-primary">
+            <i class="ph-bold ph-copy"></i>
+            <span>Konfigürasyonu Kopyala</span>
+        </button>
+    </div>
+</div>
+
+@* --------------------------------------------------------------------------
+   2. CİHAZ SEÇİM SEKMELERİ (TABS)
+   Sitede Ne İşe Yarar: CORE-01, FW-01 ASA, ISP Router ve Kat Switchleri arasında geçiş sağlar.
+--------------------------------------------------------------------------- *@
+<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+    @foreach (var cfg in configs)
+    {
+        <a href="/Home/CiscoConfig?device=@cfg.DeviceKey" class="btn @(activeKey == cfg.DeviceKey ? "btn-primary" : "btn-secondary")">
+            <i class="ph-bold ph-terminal-window"></i>
+            <span>@cfg.DeviceName.Split('(')[0].Trim()</span>
+        </a>
+    }
+</div>
+
+@* --------------------------------------------------------------------------
+   3. SEÇİLİ CİHAZ TEKNİK ÖZET KARTI
+   Sitede Ne İşe Yarar: Seçilen cihazın modelini, yönetim IP adresini ve işlevini özetler.
+--------------------------------------------------------------------------- *@
+@if (Model != null)
+{
+    <div class="panel-card" style="margin-bottom: 20px; padding: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+                <h3 style="font-size: 16px; font-weight: 700; color: #E6E6E6;">@Model.DeviceName</h3>
+                <p style="font-size: 12px; color: #8E8E8E; margin-top: 2px;">@Model.Description</p>
+            </div>
+            <div style="display: flex; gap: 12px; font-size: 12px;">
+                <span class="badge badge-vlan">Tür: @Model.DeviceType</span>
+                <span class="badge badge-online">IP: @Model.ManagementIp</span>
+            </div>
+        </div>
+    </div>
+
+    @* --------------------------------------------------------------------------
+       4. CISCO CLI TERMİNAL PENCERESİ
+       Sitede Ne İşe Yarar: Seçili cihazın running-config dosyasını terminal formatında görüntüler.
+    --------------------------------------------------------------------------- *@
+    <div class="terminal-window">
+        <div class="terminal-top-bar">
+            <div class="terminal-dots">
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+            </div>
+            <span class="terminal-title">cisco-ios-cli: running-config (@Model.DeviceKey.ToUpper())</span>
+            <span style="font-size: 11px; color: #8E8E8E;">Cisco IOS / ASA</span>
+        </div>
+
+        <div class="terminal-body" id="ciscoConfigBody">@Model.ConfigContent</div>
+    </div>
+}

@@ -1,0 +1,29 @@
+@*
+  ==============================================================================
+  NETVISION - GİZLİLİK VE POLİTİKA SAYFASI (Privacy.cshtml)
+  Manavgat Belediyesi Kurumsal Ağ Güvenliği ve Bilgi Güvenliği Politikası
+  ==============================================================================
+  Bu sayfa kurumun ağ erişim güvenliği, veri gizliliği ve log saklama esaslarını özetler.
+  ==============================================================================
+*@
+
+@{
+    ViewData["Title"] = "Gizlilik & Bilgi Güvenliği Politikası";
+}
+
+<div class="page-header-row">
+    <div>
+        <h2 class="page-header-title">Kurumsal Bilgi Güvenliği & Gizlilik</h2>
+        <p class="page-header-subtitle">Manavgat Belediyesi Ağ Altyapısı Veri Güvenliği ve Erişim Esasları</p>
+    </div>
+</div>
+
+<div class="panel-card">
+    <h3 style="font-size: 16px; font-weight: 700; color: #E6E6E6; margin-bottom: 12px;">Ağ Güvenliği İlkeleri</h3>
+    <ul style="color: #8E8E8E; font-size: 13px; line-height: 1.8; margin-left: 20px;">
+        <li>Tüm ağ trafiği, Cisco ASA 5506-X güvenlik duvarı ve Modüler Politika Çerçevesi (MPF) altında izlenmekte ve loglanmaktadır.</li>
+        <li>Misafir kablosuz ağı (VLAN 50), Zero-Trust ACL 101 kuralları ile kurum iç kaynaklarından (VLAN 10, 30, 40) tamamen izole edilmiştir.</li>
+        <li>Switch kenar portlarında Port Security ve 802.1X mekanizmaları uygulanarak yetkisiz MAC adreslerinin ağa dahil olması engellenmektedir.</li>
+        <li>Merkezi Syslog sunucusunda toplanan tüm olay kayıtları ISO 27001 ve 5651 sayılı kanun gereksinimlerine uygun şekilde saklanmaktadır.</li>
+    </ul>
+</div>

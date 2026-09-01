@@ -1,0 +1,94 @@
+@*
+  ==============================================================================
+  NETVISION - VLAN & PORT MATRİSİ (PortMatrix.cshtml)
+  Manavgat Belediyesi 8 Katlı Akıllı Bina Switch Port Dağılımı
+  ==============================================================================
+  Bu sayfa kat switchlerinin port kapasitesini ve VLAN dağılımını gösterir:
+  - 8 katın her birindeki Catalyst 2960 switchlerin toplam ve aktif port sayısı
+  - Personel (Data), Ses (VoIP), Güvenlik (CCTV) ve Misafir (Wi-Fi) port tahsisleri
+  - 802.1Q omurga trunk uplink bağlantı durumları.
+  ==============================================================================
+*@
+
+@model List<NetVision.NetworkManagement.Models.FloorSpec>
+@{
+    ViewData["Title"] = "VLAN & Port Matrisi";
+    var vlans = ViewBag.Vlans as List<NetVision.NetworkManagement.Models.VlanInfo> ?? new();
+}
+
+@* --------------------------------------------------------------------------
+   1. SAYFA BAŞLIĞI VE ÖZET
+   Sitede Ne İşe Yarar: Port matrisi sayfasının başlığını ve genel özetini verir.
+--------------------------------------------------------------------------- *@
+<div class="page-header-row">
+    <div>
+        <h2 class="page-header-title">VLAN & Kat Bazlı Port Matrisi</h2>
+        <p class="page-header-subtitle">8 Katlı Yönetim Binası Kat Switchlerinin Port Tahsisi, PoE Dağılımı ve Kapasite Kullanımı</p>
+    </div>
+    <div class="page-header-actions">
+        <span class="badge badge-vlan">Toplam 9 Adet Catalyst 2960 Dağıtım Switchi</span>
+    </div>
+</div>
+
+@* --------------------------------------------------------------------------
+   2. KAT BAZLI PORT VE SWITCH KARTLARI
+   Sitede Ne İşe Yarar: Her katın switch'ini, toplam portunu, PC, Kamera, AP ve Telefon portlarını gösterir.
+--------------------------------------------------------------------------- *@
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px;">
+    @foreach (var fl in Model)
+    {
+        int totalSwitchPorts = fl.Floor == "3" ? 52 : (fl.Floor == "-2" || fl.Floor == "-1" ? 24 : 48);
+        int usedPorts = fl.RequiredPorts;
+        double usagePercent = Math.Round((double)usedPorts / totalSwitchPorts * 100, 1);
+
+        <div class="panel-card" style="margin-bottom: 0;">
+            <div class="panel-header-row">
+                <div>
+                    <span class="badge badge-vlan">Kat @fl.Floor</span>
+                    <h4 style="font-size: 15px; font-weight: 700; color: #E6E6E6; margin-top: 4px;">@fl.Name</h4>
+                </div>
+                <span class="badge badge-online">@fl.SwitchModel.Split(' ')[0]</span>
+            </div>
+
+            <div style="font-size: 12px; color: #8E8E8E; margin-bottom: 12px;">
+                <span>Yönetim IP: <strong style="font-family: var(--font-mono); color: #E6E6E6;">@fl.SwitchIp</strong></span>
+            </div>
+
+            @* Port Kullanım Çubuğu *@
+            <div style="margin-bottom: 14px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
+                    <span style="color: #8E8E8E;">Port Kullanımı (@usedPorts / @totalSwitchPorts Port)</span>
+                    <strong style="color: #E6E6E6;">%@usagePercent</strong>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-bar-fill" style="width: @usagePercent%;"></div>
+                </div>
+            </div>
+
+            @* Port Cihaz Dağılım Tablosu *@
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
+                <div style="background-color: #212121; padding: 8px 10px; border-radius: 6px; border: 1px solid #2B2B2B;">
+                    <span style="color: #8E8E8E; display: block; font-size: 11px;">PC (VLAN 20)</span>
+                    <strong style="color: #E6E6E6;">@fl.PcCount Port</strong>
+                </div>
+                <div style="background-color: #212121; padding: 8px 10px; border-radius: 6px; border: 1px solid #2B2B2B;">
+                    <span style="color: #8E8E8E; display: block; font-size: 11px;">IP Kamera (VLAN 40)</span>
+                    <strong style="color: #E6E6E6;">@fl.CameraCount Port (PoE)</strong>
+                </div>
+                <div style="background-color: #212121; padding: 8px 10px; border-radius: 6px; border: 1px solid #2B2B2B;">
+                    <span style="color: #8E8E8E; display: block; font-size: 11px;">Wi-Fi AP (VLAN 50)</span>
+                    <strong style="color: #E6E6E6;">@fl.ApCount Port (PoE)</strong>
+                </div>
+                <div style="background-color: #212121; padding: 8px 10px; border-radius: 6px; border: 1px solid #2B2B2B;">
+                    <span style="color: #8E8E8E; display: block; font-size: 11px;">VoIP Tel (VLAN 60)</span>
+                    <strong style="color: #E6E6E6;">@fl.PhoneCount Port</strong>
+                </div>
+            </div>
+
+            <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #2B2B2B; display: flex; justify-content: space-between; font-size: 11px; color: #8E8E8E;">
+                <span>Uplink: <strong>Gig0/1 ➔ CORE-01 (Trunk)</strong></span>
+                <span class="badge badge-online">802.1Q Aktif</span>
+            </div>
+        </div>
+    }
+</div>

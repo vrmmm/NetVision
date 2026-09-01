@@ -1,0 +1,814 @@
+! ==============================================================================
+! NETVISION - MANAVGAT BELEDIYESI
+! ERISIM SWITCHLERI (ACCESS SWITCHES) TAM KONFIGURASYON PAKETI (9 ADET SWITCH)
+! Cihaz Modeli: Cisco Catalyst 2960-24TT / 2960-48TT
+! ==============================================================================
+
+! ##############################################################################
+! 1. SWITCH: SW-M2-01 (KAT -2: TEKNIK ALTYAPI VE DEPO)
+! ##############################################################################
+enable
+configure terminal
+hostname SW-M2-01
+no ip domain-lookup
+service password-encryption
+username admin privilege 15 secret Cisco@123
+enable secret Cisco@123
+
+vlan 10
+ name MANAGEMENT
+vlan 20
+ name USERS
+vlan 40
+ name SECURITY
+vlan 50
+ name GUEST
+vlan 60
+ name VOICE
+exit
+
+interface Vlan10
+ description YONETIM_SVI
+ ip address 10.10.10.4 255.255.255.0
+ no shutdown
+exit
+ip default-gateway 10.10.10.1
+
+! Uplink to CORE-01 (Gig0/1)
+interface GigabitEthernet0/1
+ description UPLINK_TO_CORE-01_G0/2
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,40,50,60
+ switchport nonegotiate
+ no shutdown
+exit
+
+! Kat -2 Cihaz Portlari:
+! Fa0/1 - 6: PC (5 Adet) + Yazici (1 Adet) (VLAN 20 + Voice VLAN 60)
+interface range FastEthernet0/1 - 6
+ description USERS_AND_VOIP
+ switchport mode access
+ switchport access vlan 20
+ switchport voice vlan 60
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ no shutdown
+exit
+
+! Fa0/7 - 10: IP Kameralar (4 Adet) (VLAN 40)
+interface range FastEthernet0/7 - 10
+ description SECURITY_CAMERAS
+ switchport mode access
+ switchport access vlan 40
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ no shutdown
+exit
+
+! Fa0/11: Access Point (1 Adet) (VLAN 50)
+interface FastEthernet0/11
+ description ACCESS_POINT_GUEST_WIFI
+ switchport mode access
+ switchport access vlan 50
+ spanning-tree portfast
+ no shutdown
+exit
+
+! Kapatilan Bos Portlar
+interface range FastEthernet0/12 - 24, GigabitEthernet0/2
+ description UNUSED
+ shutdown
+exit
+
+line con 0
+ login local
+line vty 0 15
+ login local
+ transport input ssh telnet
+exit
+end
+write memory
+
+
+! ##############################################################################
+! 2. SWITCH: SW-M1-01 (KAT -1: ARSIV VE LOJISTIK)
+! ##############################################################################
+enable
+configure terminal
+hostname SW-M1-01
+no ip domain-lookup
+service password-encryption
+username admin privilege 15 secret Cisco@123
+enable secret Cisco@123
+
+vlan 10
+ name MANAGEMENT
+vlan 20
+ name USERS
+vlan 40
+ name SECURITY
+vlan 50
+ name GUEST
+vlan 60
+ name VOICE
+exit
+
+interface Vlan10
+ description YONETIM_SVI
+ ip address 10.10.10.5 255.255.255.0
+ no shutdown
+exit
+ip default-gateway 10.10.10.1
+
+! Uplink to CORE-01 (Gig0/1)
+interface GigabitEthernet0/1
+ description UPLINK_TO_CORE-01_G0/3
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,40,50,60
+ switchport nonegotiate
+ no shutdown
+exit
+
+! Fa0/1 - 12: PC (10 Adet) + Yazici (1 Adet) + IP Phone (2 Adet) (VLAN 20 + Voice VLAN 60)
+interface range FastEthernet0/1 - 12
+ description USERS_AND_VOIP
+ switchport mode access
+ switchport access vlan 20
+ switchport voice vlan 60
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ no shutdown
+exit
+
+! Fa0/13 - 16: IP Kameralar (4 Adet) (VLAN 40)
+interface range FastEthernet0/13 - 16
+ description SECURITY_CAMERAS
+ switchport mode access
+ switchport access vlan 40
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ no shutdown
+exit
+
+! Fa0/17: Access Point (1 Adet) (VLAN 50)
+interface FastEthernet0/17
+ description ACCESS_POINT_GUEST_WIFI
+ switchport mode access
+ switchport access vlan 50
+ spanning-tree portfast
+ no shutdown
+exit
+
+! Kapatilan Bos Portlar
+interface range FastEthernet0/18 - 24, GigabitEthernet0/2
+ description UNUSED
+ shutdown
+exit
+
+line con 0
+ login local
+line vty 0 15
+ login local
+ transport input ssh telnet
+exit
+end
+write memory
+
+
+! ##############################################################################
+! 3. SWITCH: SW-GF-01 (ZEMIN KAT: RESEPSIYON, GUVENLIK VE DANISMA)
+! ##############################################################################
+enable
+configure terminal
+hostname SW-GF-01
+no ip domain-lookup
+service password-encryption
+username admin privilege 15 secret Cisco@123
+enable secret Cisco@123
+
+vlan 10
+ name MANAGEMENT
+vlan 20
+ name USERS
+vlan 40
+ name SECURITY
+vlan 50
+ name GUEST
+vlan 60
+ name VOICE
+exit
+
+interface Vlan10
+ description YONETIM_SVI
+ ip address 10.10.10.6 255.255.255.0
+ no shutdown
+exit
+ip default-gateway 10.10.10.1
+
+! Uplink to CORE-01 (Gig0/1)
+interface GigabitEthernet0/1
+ description UPLINK_TO_CORE-01_G0/4
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,40,50,60
+ switchport nonegotiate
+ no shutdown
+exit
+
+! Fa0/1 - 17: PC (15 Adet) + Yazici (2 Adet) + IP Phone (4 Adet) (VLAN 20 + Voice VLAN 60)
+interface range FastEthernet0/1 - 17
+ description USERS_AND_VOIP
+ switchport mode access
+ switchport access vlan 20
+ switchport voice vlan 60
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ no shutdown
+exit
+
+! Fa0/18 - 21: IP Kameralar (4 Adet) (VLAN 40)
+interface range FastEthernet0/18 - 21
+ description SECURITY_CAMERAS
+ switchport mode access
+ switchport access vlan 40
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ no shutdown
+exit
+
+! Fa0/22 - 23: Access Points (2 Adet) (VLAN 50)
+interface range FastEthernet0/22 - 23
+ description ACCESS_POINTS_GUEST_WIFI
+ switchport mode access
+ switchport access vlan 50
+ spanning-tree portfast
+ no shutdown
+exit
+
+! Kapatilan Bos Portlar
+interface range FastEthernet0/24, GigabitEthernet0/2
+ description UNUSED
+ shutdown
+exit
+
+line con 0
+ login local
+line vty 0 15
+ login local
+ transport input ssh telnet
+exit
+end
+write memory
+
+
+! ##############################################################################
+! 4. SWITCH: SW-01-01 (KAT 1: INSAN KAYNAKLARI)
+! ##############################################################################
+enable
+configure terminal
+hostname SW-01-01
+no ip domain-lookup
+service password-encryption
+username admin privilege 15 secret Cisco@123
+enable secret Cisco@123
+
+vlan 10
+ name MANAGEMENT
+vlan 20
+ name USERS
+vlan 40
+ name SECURITY
+vlan 50
+ name GUEST
+vlan 60
+ name VOICE
+exit
+
+interface Vlan10
+ description YONETIM_SVI
+ ip address 10.10.10.7 255.255.255.0
+ no shutdown
+exit
+ip default-gateway 10.10.10.1
+
+! Uplink to CORE-01 (Gig0/1)
+interface GigabitEthernet0/1
+ description UPLINK_TO_CORE-01_G0/5
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,40,50,60
+ switchport nonegotiate
+ no shutdown
+exit
+
+! Fa0/1 - 22: PC (20 Adet) + Yazici (2 Adet) + IP Phone (5 Adet) (VLAN 20 + Voice VLAN 60)
+interface range FastEthernet0/1 - 22
+ description USERS_AND_VOIP
+ switchport mode access
+ switchport access vlan 20
+ switchport voice vlan 60
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ no shutdown
+exit
+
+! Fa0/23 - 26 (Gig0/2 yedekli veya 48 portlu modellerde 23-26): IP Kameralar (4 Adet)
+! 24 Port switch durumunda Fa0/23-24 kamera ve AP dagilimi yapilmistir
+interface range FastEthernet0/23 - 24
+ description SECURITY_AND_WIFI
+ switchport mode access
+ switchport access vlan 40
+ spanning-tree portfast
+ no shutdown
+exit
+
+interface GigabitEthernet0/2
+ description UNUSED
+ shutdown
+exit
+
+line con 0
+ login local
+line vty 0 15
+ login local
+ transport input ssh telnet
+exit
+end
+write memory
+
+
+! ##############################################################################
+! 5. SWITCH: SW-02-01 (KAT 2: MUHASEBE VE FINANS)
+! ##############################################################################
+enable
+configure terminal
+hostname SW-02-01
+no ip domain-lookup
+service password-encryption
+username admin privilege 15 secret Cisco@123
+enable secret Cisco@123
+
+vlan 10
+ name MANAGEMENT
+vlan 20
+ name USERS
+vlan 40
+ name SECURITY
+vlan 50
+ name GUEST
+vlan 60
+ name VOICE
+exit
+
+interface Vlan10
+ description YONETIM_SVI
+ ip address 10.10.10.8 255.255.255.0
+ no shutdown
+exit
+ip default-gateway 10.10.10.1
+
+! Uplink to CORE-01 (Gig0/1)
+interface GigabitEthernet0/1
+ description UPLINK_TO_CORE-01_G0/6
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,40,50,60
+ switchport nonegotiate
+ no shutdown
+exit
+
+! Fa0/1 - 20: PC ve Muhasebe Terminal Portlari (VLAN 20 + Voice VLAN 60)
+interface range FastEthernet0/1 - 20
+ description USERS_AND_VOIP
+ switchport mode access
+ switchport access vlan 20
+ switchport voice vlan 60
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ no shutdown
+exit
+
+! Fa0/21 - 24: IP Kameralar ve AP Portlari
+interface range FastEthernet0/21 - 22
+ description CAMERAS
+ switchport mode access
+ switchport access vlan 40
+ spanning-tree portfast
+ no shutdown
+exit
+
+interface range FastEthernet0/23 - 24
+ description WIFI_AP
+ switchport mode access
+ switchport access vlan 50
+ spanning-tree portfast
+ no shutdown
+exit
+
+line con 0
+ login local
+line vty 0 15
+ login local
+ transport input ssh telnet
+exit
+end
+write memory
+
+
+! ##############################################################################
+! 6. SWITCH: SW-03-01 (KAT 3 - A GRUBU: YAZILIM VE AR-GE)
+! ##############################################################################
+enable
+configure terminal
+hostname SW-03-01
+no ip domain-lookup
+service password-encryption
+username admin privilege 15 secret Cisco@123
+enable secret Cisco@123
+
+vlan 10
+ name MANAGEMENT
+vlan 20
+ name USERS
+vlan 40
+ name SECURITY
+vlan 50
+ name GUEST
+vlan 60
+ name VOICE
+exit
+
+interface Vlan10
+ description YONETIM_SVI
+ ip address 10.10.10.9 255.255.255.0
+ no shutdown
+exit
+ip default-gateway 10.10.10.1
+
+! Uplink to CORE-01 (Gig0/1)
+interface GigabitEthernet0/1
+ description UPLINK_TO_CORE-01_G0/7
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,40,50,60
+ switchport nonegotiate
+ no shutdown
+exit
+
+! Fa0/1 - 20: Yazilim Gelistirici PC'leri (18 Adet) + Yazici (1 Adet) + IP Phone (4 Adet)
+interface range FastEthernet0/1 - 20
+ description DEV_TEAM_A
+ switchport mode access
+ switchport access vlan 20
+ switchport voice vlan 60
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ no shutdown
+exit
+
+! Fa0/21 - 22: Kameralar
+interface range FastEthernet0/21 - 22
+ description CAMERAS
+ switchport mode access
+ switchport access vlan 40
+ spanning-tree portfast
+ no shutdown
+exit
+
+! Fa0/23: AP
+interface FastEthernet0/23
+ description AP_01
+ switchport mode access
+ switchport access vlan 50
+ spanning-tree portfast
+ no shutdown
+exit
+
+interface FastEthernet0/24
+ description UNUSED
+ shutdown
+exit
+
+line con 0
+ login local
+line vty 0 15
+ login local
+ transport input ssh telnet
+exit
+end
+write memory
+
+
+! ##############################################################################
+! 7. SWITCH: SW-03-02 (KAT 3 - B GRUBU: AR-GE VE LAB)
+! ##############################################################################
+enable
+configure terminal
+hostname SW-03-02
+no ip domain-lookup
+service password-encryption
+username admin privilege 15 secret Cisco@123
+enable secret Cisco@123
+
+vlan 10
+ name MANAGEMENT
+vlan 20
+ name USERS
+vlan 40
+ name SECURITY
+vlan 50
+ name GUEST
+vlan 60
+ name VOICE
+exit
+
+interface Vlan10
+ description YONETIM_SVI
+ ip address 10.10.10.10 255.255.255.0
+ no shutdown
+exit
+ip default-gateway 10.10.10.1
+
+! Uplink to CORE-01 (Gig0/1)
+interface GigabitEthernet0/1
+ description UPLINK_TO_CORE-01_G0/8
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,40,50,60
+ switchport nonegotiate
+ no shutdown
+exit
+
+! Fa0/1 - 20: Ar-Ge PC'leri (17 Adet) + Yazici (1 Adet) + IP Phone (4 Adet)
+interface range FastEthernet0/1 - 20
+ description ARGE_TEAM_B
+ switchport mode access
+ switchport access vlan 20
+ switchport voice vlan 60
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ no shutdown
+exit
+
+! Fa0/21 - 22: Kameralar
+interface range FastEthernet0/21 - 22
+ description CAMERAS
+ switchport mode access
+ switchport access vlan 40
+ spanning-tree portfast
+ no shutdown
+exit
+
+! Fa0/23: AP
+interface FastEthernet0/23
+ description AP_02
+ switchport mode access
+ switchport access vlan 50
+ spanning-tree portfast
+ no shutdown
+exit
+
+interface FastEthernet0/24
+ description UNUSED
+ shutdown
+exit
+
+line con 0
+ login local
+line vty 0 15
+ login local
+ transport input ssh telnet
+exit
+end
+write memory
+
+
+! ##############################################################################
+! 8. SWITCH: SW-04-01 (KAT 4: YONETIM VE TOPLANTI SALONLARI)
+! ##############################################################################
+enable
+configure terminal
+hostname SW-04-01
+no ip domain-lookup
+service password-encryption
+username admin privilege 15 secret Cisco@123
+enable secret Cisco@123
+
+vlan 10
+ name MANAGEMENT
+vlan 20
+ name USERS
+vlan 40
+ name SECURITY
+vlan 50
+ name GUEST
+vlan 60
+ name VOICE
+exit
+
+interface Vlan10
+ description YONETIM_SVI
+ ip address 10.10.10.11 255.255.255.0
+ no shutdown
+exit
+ip default-gateway 10.10.10.1
+
+! Uplink to CORE-01 (Gig0/1)
+interface GigabitEthernet0/1
+ description UPLINK_TO_CORE-01_G0/9
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,40,50,60
+ switchport nonegotiate
+ no shutdown
+exit
+
+! Fa0/1 - 18: Yonetim PC'leri (15 Adet) + Toplanti/Sunum Laptop (5 Adet) + IP Phone (7 Adet)
+interface range FastEthernet0/1 - 18
+ description MANAGEMENT_USERS_AND_VOIP
+ switchport mode access
+ switchport access vlan 20
+ switchport voice vlan 60
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ no shutdown
+exit
+
+! Fa0/19 - 22: Kameralar
+interface range FastEthernet0/19 - 22
+ description CAMERAS
+ switchport mode access
+ switchport access vlan 40
+ spanning-tree portfast
+ no shutdown
+exit
+
+! Fa0/23 - 24: Toplanti Salonu Misafir AP'leri (VLAN 50)
+interface range FastEthernet0/23 - 24
+ description VIP_GUEST_WIFI_APS
+ switchport mode access
+ switchport access vlan 50
+ spanning-tree portfast
+ no shutdown
+exit
+
+line con 0
+ login local
+line vty 0 15
+ login local
+ transport input ssh telnet
+exit
+end
+write memory
+
+
+! ##############################################################################
+! 9. SWITCH: SW-05-01 (KAT 5: BILGI ISLEM VE SISTEM ODASI)
+! ##############################################################################
+enable
+configure terminal
+hostname SW-05-01
+no ip domain-lookup
+service password-encryption
+username admin privilege 15 secret Cisco@123
+enable secret Cisco@123
+
+vlan 10
+ name MANAGEMENT
+vlan 20
+ name USERS
+vlan 30
+ name SERVERS
+vlan 40
+ name SECURITY
+vlan 50
+ name GUEST
+vlan 60
+ name VOICE
+exit
+
+interface Vlan10
+ description YONETIM_SVI
+ ip address 10.10.10.12 255.255.255.0
+ no shutdown
+exit
+ip default-gateway 10.10.10.1
+
+! Uplink to CORE-01 (Gig0/1)
+interface GigabitEthernet0/1
+ description UPLINK_TO_CORE-01_G0/10
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,40,50,60
+ switchport nonegotiate
+ no shutdown
+exit
+
+! Fa0/1 - 10: Sistem Odasi Kurumsal Sunucular (VLAN 30 - SERVERS)
+! SRV-01 (10.10.30.10) - AD / DNS Server
+! SRV-02 (10.10.30.11) - Web / Intranet Server
+! SRV-03 (10.10.30.12) - Database Server
+! SRV-04 (10.10.30.13) - File / Backup Server
+! SRV-05 (10.10.30.14) - Mail Server
+! SRV-06 (10.10.30.15) - Monitoring / NetVision Server
+interface range FastEthernet0/1 - 6
+ description CENTRAL_SERVERS
+ switchport mode access
+ switchport access vlan 30
+ spanning-tree portfast
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ no shutdown
+exit
+
+! Fa0/7 - 16: Bilgi Islem Personeli PC'leri & Yonetim Konsollari (VLAN 20 & VLAN 10)
+interface range FastEthernet0/7 - 14
+ description IT_STAFF_WORKSTATIONS
+ switchport mode access
+ switchport access vlan 20
+ switchport voice vlan 60
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ no shutdown
+exit
+
+! Fa0/15 - 16: Admin / Network Yonetim PC'si (VLAN 10 - MANAGEMENT)
+interface range FastEthernet0/15 - 16
+ description DIRECT_ADMIN_MANAGEMENT_PORTS
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ no shutdown
+exit
+
+! Fa0/17 - 20: Sistem Odasi Guvenlik Kameralari (VLAN 40)
+interface range FastEthernet0/17 - 20
+ description SERVER_ROOM_SECURITY_CAMERAS
+ switchport mode access
+ switchport access vlan 40
+ spanning-tree portfast
+ no shutdown
+exit
+
+! Fa0/21 - 23: AP'ler (VLAN 50)
+interface range FastEthernet0/21 - 23
+ description IT_FLOOR_APS
+ switchport mode access
+ switchport access vlan 50
+ spanning-tree portfast
+ no shutdown
+exit
+
+interface FastEthernet0/24
+ description UNUSED
+ shutdown
+exit
+
+line con 0
+ login local
+line vty 0 15
+ login local
+ transport input ssh telnet
+exit
+end
+write memory

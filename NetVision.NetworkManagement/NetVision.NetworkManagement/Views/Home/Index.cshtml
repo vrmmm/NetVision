@@ -1,0 +1,156 @@
+@*
+  ==============================================================================
+  NETVISION - KURUMSAL KARŞILAMA VE GİRİŞ SAYFASI (Index.cshtml)
+  Manavgat Belediyesi 8 Katlı Akıllı Bina Ağ Yönetim Platformu
+  ==============================================================================
+  Bu sayfa projenin ana giriş ekranıdır:
+  - Manavgat Belediyesi kurumsal ağ altyapısının genel tanıtımını yapar.
+  - Özet sayaç kartları ile 157 cihaz, 6 aktif VLAN ve omurga durumunu özetler.
+  - Ağ yöneticisini Dashboard, Topoloji, Envanter, Ping Aracı ve Test Matrisine yönlendirir.
+  ==============================================================================
+*@
+
+@model NetVision.NetworkManagement.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Ana Sayfa - Kurumsal Ağ Yönetimi";
+}
+
+<div class="hero-wrapper">
+    @* --------------------------------------------------------------------------
+       1. HERO ETİKETİ VE BAŞLIK
+       Sitede Ne İşe Yarar: Proje adı ve kurum aidiyetini vurgular.
+    --------------------------------------------------------------------------- *@
+    <div class="hero-pill-tag">
+        <i class="ph-bold ph-buildings"></i>
+        <span>Manavgat Belediyesi • 8 Katlı Akıllı Yönetim Binası</span>
+    </div>
+
+    <h1 class="hero-title">
+        Kurumsal Ağ Altyapısı ve<br />
+        <span>Merkezi Yönetim Platformu</span>
+    </h1>
+
+    <p class="hero-lead-text">
+        Cisco Catalyst 3560 Omurga Switch, Cisco ASA 5506-X Güvenlik Duvarı ve 8 katlı dağıtım ağı 
+        üzerindeki 157 uç ve ağ cihazının canlı izlenmesi, VLAN segmentasyonu ve ICMP teşhis merkezi.
+    </p>
+
+    @* --------------------------------------------------------------------------
+       2. HIZLI ERİŞİM VE AKSİYON BUTONLARI
+       Sitede Ne İşe Yarar: Kullanıcıyı Dashboard veya İnteraktif Topolojiye tek tıkla yönlendirir.
+    --------------------------------------------------------------------------- *@
+    <div class="hero-actions-row">
+        <a href="/Home/Dashboard" class="btn btn-primary" style="padding: 12px 24px; font-size: 14px;">
+            <i class="ph-bold ph-chart-polar"></i>
+            <span>Dashboard'a Git</span>
+        </a>
+        <a href="/Home/Topology" class="btn btn-secondary" style="padding: 12px 24px; font-size: 14px;">
+            <i class="ph-bold ph-tree-structure"></i>
+            <span>İnteraktif Topoloji</span>
+        </a>
+        <a href="/Home/PingTool" class="btn btn-outline" style="padding: 12px 24px; font-size: 14px;">
+            <i class="ph-bold ph-broadcast"></i>
+            <span>ICMP Ping Teşhis</span>
+        </a>
+    </div>
+
+    @* --------------------------------------------------------------------------
+       3. METRİK SAYAC KARTLARI (ÖZET)
+       Sitede Ne İşe Yarar: Ağdaki toplam cihaz, aktif VLAN, gecikme ve güvenlik duvarı durumunu gösterir.
+    --------------------------------------------------------------------------- *@
+    <div class="metrics-grid-4" style="margin-bottom: 48px;">
+        <div class="metric-box-card">
+            <div class="metric-icon-square">
+                <i class="ph-bold ph-hard-drives"></i>
+            </div>
+            <div class="metric-content">
+                <span class="metric-title">Toplam Cihaz</span>
+                <span class="metric-value-number">@Model.TotalDeviceCount</span>
+                <span class="metric-sub-note">145 PC + 12 Altyapı</span>
+            </div>
+        </div>
+
+        <div class="metric-box-card">
+            <div class="metric-icon-square">
+                <i class="ph-bold ph-squares-four"></i>
+            </div>
+            <div class="metric-content">
+                <span class="metric-title">Aktif VLAN</span>
+                <span class="metric-value-number">@Model.ActiveVlanCount</span>
+                <span class="metric-sub-note">Segmentli Güvenli Ağ</span>
+            </div>
+        </div>
+
+        <div class="metric-box-card">
+            <div class="metric-icon-square">
+                <i class="ph-bold ph-activity"></i>
+            </div>
+            <div class="metric-content">
+                <span class="metric-title">Ortalama Gecikme</span>
+                <span class="metric-value-number">@Model.AverageLatencyMs ms</span>
+                <span class="metric-sub-note">Omurga Ping Süresi</span>
+            </div>
+        </div>
+
+        <div class="metric-box-card">
+            <div class="metric-icon-square">
+                <i class="ph-bold ph-shield-check"></i>
+            </div>
+            <div class="metric-content">
+                <span class="metric-title">Güvenlik Duvarı</span>
+                <span class="metric-value-number" style="font-size: 18px;">ASA 5506-X</span>
+                <span class="metric-sub-note">Dynamic PAT Aktif</span>
+            </div>
+        </div>
+    </div>
+
+    @* --------------------------------------------------------------------------
+       4. ÖNE ÇIKAN SİSTEM ÖZELLİKLERİ KARTLARI
+       Sitede Ne İşe Yarar: Projede geliştirilen modüllerin teknik kabiliyetlerini listeler.
+    --------------------------------------------------------------------------- *@
+    <div class="feature-cards-grid">
+        <div class="feature-card-item">
+            <div class="feature-card-icon">
+                <i class="ph-bold ph-tree-structure"></i>
+            </div>
+            <h3 class="feature-card-title">Hiyerarşik Ağ Topolojisi</h3>
+            <p class="feature-card-desc">
+                Cisco 3-katmanlı tasarım ilkelerine uygun Omurga (Core), Dağıtım (Distribution) 
+                ve Erişim (Access) mimarisinin interaktif SVG ve düğüm bazlı şeması.
+            </p>
+        </div>
+
+        <div class="feature-card-item">
+            <div class="feature-card-icon">
+                <i class="ph-bold ph-shield-chevron"></i>
+            </div>
+            <h3 class="feature-card-title">Gelişmiş Güvenlik ve ACL</h3>
+            <p class="feature-card-desc">
+                Misafir ağı izolasyonu (ACL 101), yönetim arayüzü koruması (ACL 102),
+                Switch Port Security (MAC kısıtlama) ve ASA Stateful Inspection.
+            </p>
+        </div>
+
+        <div class="feature-card-item">
+            <div class="feature-card-icon">
+                <i class="ph-bold ph-broadcast"></i>
+            </div>
+            <h3 class="feature-card-title">Canlı ICMP / Ping Teşhis</h3>
+            <p class="feature-card-desc">
+                Ağdaki herhangi bir IP'ye, kat switchine veya sunucuya tek tıkla canlı ping
+                gönderip paket kaybı, TTL ve milisaniye bazlı RTT süresini ölçme.
+            </p>
+        </div>
+
+        <div class="feature-card-item">
+            <div class="feature-card-icon">
+                <i class="ph-bold ph-terminal-window"></i>
+            </div>
+            <h3 class="feature-card-title">Cisco CLI Konfigürasyonları</h3>
+            <p class="feature-card-desc">
+                Catalyst 3560, ASA 5506-X ve Catalyst 2960 switchlerin çalışan IOS/ASA
+                CLI komut satırı dosyalarını tek ekranda inceleme ve kopyalama.
+            </p>
+        </div>
+    </div>
+</div>

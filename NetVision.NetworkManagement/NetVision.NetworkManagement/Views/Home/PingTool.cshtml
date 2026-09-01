@@ -1,0 +1,102 @@
+@*
+  ==============================================================================
+  NETVISION - CANLI PING & ICMP TEŞHİS KONSOLU (PingTool.cshtml)
+  Manavgat Belediyesi 8 Katlı Akıllı Bina Ağ Teşhis ve Gecikme Ölçüm Aracı
+  ==============================================================================
+  Bu sayfa ağ yöneticisinin anlık ICMP paketleri göndermesini sağlar:
+  - Hızlı hedef seçim listesinden hazır omurga veya sunucu IP'leri seçme
+  - Manuel IP girerek uçtan uca ağ erişilebilirliği ve paket kaybını test etme
+  - Cisco / Windows tarzı gerçekçi terminal çıktısı ve istatistik özeti.
+  ==============================================================================
+*@
+
+@model List<NetVision.NetworkManagement.Models.NetworkDevice>
+@{
+    ViewData["Title"] = "Canlı Ping & ICMP Teşhis";
+}
+
+@* --------------------------------------------------------------------------
+   1. SAYFA BAŞLIĞI VE TEŞHİS AMACI
+   Sitede Ne İşe Yarar: ICMP test modülünün tanıtımını yapar.
+--------------------------------------------------------------------------- *@
+<div class="page-header-row">
+    <div>
+        <h2 class="page-header-title">Canlı Ping & ICMP Ağ Teşhisi</h2>
+        <p class="page-header-subtitle">Merkezi Omurga, Güvenlik Duvarı, Sunucular veya Dış Ağ IP'lerine Canlı ICMP Paketi Gönderme</p>
+    </div>
+    <div class="page-header-actions">
+        <span class="badge badge-vlan">Protokol: ICMP Echo (RFC 792)</span>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 360px 1fr; gap: 24px; align-items: start;">
+
+    @* --------------------------------------------------------------------------
+       2. PING TESTİ BAŞLATMA FORMU
+       Sitede Ne İşe Yarar: Hedef IP seçimi ve Ping başlatma butonunu içerir.
+    --------------------------------------------------------------------------- *@
+    <div class="panel-card">
+        <div class="panel-header-row">
+            <h3 class="panel-title-text">
+                <i class="ph-bold ph-faders"></i>
+                <span>Teşhis Parametreleri</span>
+            </h3>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div>
+                <label style="font-size: 12px; font-weight: 600; color: #8E8E8E; display: block; margin-bottom: 6px;">Hızlı Hedef Seçimi:</label>
+                <select id="pingPresetSelect" class="form-select">
+                    <option value="">-- Bir Hedef Cihaz Seçin --</option>
+                    <option value="10.10.10.1">CORE-01 Omurga Switch (10.10.10.1)</option>
+                    <option value="10.10.10.3">FW-01 ASA Inside (10.10.10.3)</option>
+                    <option value="203.0.113.2">FW-01 ASA Outside (203.0.113.2)</option>
+                    <option value="203.0.113.1">ISP-RTR WAN Gateway (203.0.113.1)</option>
+                    <option value="8.8.8.8">Dış DNS Simülasyonu (8.8.8.8)</option>
+                    <option value="10.10.30.10">SRV-01 AD & DNS (10.10.30.10)</option>
+                    <option value="10.10.30.11">SRV-02 Web Sunucusu (10.10.30.11)</option>
+                    <option value="10.10.30.12">SRV-03 Veritabanı Sunucusu (10.10.30.12)</option>
+                    <option value="10.10.10.6">SW-GF-01 Zemin Kat Switch (10.10.10.6)</option>
+                    <option value="10.10.10.7">SW-01-01 Kat 1 Switch (10.10.10.7)</option>
+                </select>
+            </div>
+
+            <div>
+                <label style="font-size: 12px; font-weight: 600; color: #8E8E8E; display: block; margin-bottom: 6px;">Hedef IP veya Host Adresi:</label>
+                <input type="text" id="pingTargetInput" class="form-control" placeholder="Örn: 10.10.10.1 veya 8.8.8.8" value="10.10.10.1" />
+            </div>
+
+            <div style="background-color: #212121; border: 1px solid #2B2B2B; border-radius: 6px; padding: 12px; font-size: 12px; color: #8E8E8E;">
+                <div style="margin-bottom: 4px;"><strong style="color: #E6E6E6;">Paket Boyutu:</strong> 32 Bytes</div>
+                <div style="margin-bottom: 4px;"><strong style="color: #E6E6E6;">Paket Sayısı:</strong> 4 Adet</div>
+                <div><strong style="color: #E6E6E6;">Zaman Aşımı:</strong> 2000 ms</div>
+            </div>
+
+            <button id="runPingBtn" class="btn btn-primary" style="width: 100%;">
+                <i class="ph-bold ph-play-circle"></i>
+                <span>Ping Testini Başlat</span>
+            </button>
+        </div>
+    </div>
+
+    @* --------------------------------------------------------------------------
+       3. CLI TERMİNAL PENCERESİ (ÇIKTI EKRANI)
+       Sitede Ne İşe Yarar: ICMP echo ve reply paketlerinin gerçek zamanlı komut satırı çıktısını gösterir.
+    --------------------------------------------------------------------------- *@
+    <div class="terminal-window">
+        <div class="terminal-top-bar">
+            <div class="terminal-dots">
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+            </div>
+            <span class="terminal-title">netvision@manavgat-core:~ # ping-diag-console</span>
+            <span style="font-size: 11px; color: #8E8E8E;">ICMP v4</span>
+        </div>
+
+        <div class="terminal-body" id="pingTerminalOutput">NetVision ICMP Teşhis Konsoluna Hoş Geldiniz.
+Hedef IP belirleyip "Ping Testini Başlat" butonuna tıklayınız...
+</div>
+    </div>
+
+</div>
