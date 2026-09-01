@@ -53,12 +53,11 @@ izlenmesi ve yönetilmesi amacıyla geliştirilecektir.
 
 Yazılım bileşenlerinde;
 
-- Python
-- FastAPI
-- MySQL
-- HTML/CSS/JavaScript
+- ASP.NET  
+- Core MVC
+- C#
 
-gibi teknolojilerin kullanılması planlanmaktadır.
+Teknolojilerin kullanılması planlanmaktadır.
 
 ---
 
