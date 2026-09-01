@@ -57,12 +57,15 @@ NetVision/
 │
 └── NetVision.NetworkManagement/   # ASP.NET Core MVC Uygulaması
     └── NetVision.NetworkManagement/
-        ├── Controllers/           # HTTP isteklerini işleyen controller'lar
-        ├── Models/               # Veri modelleri
-        ├── Services/             # İş mantığı ve servisler
-        ├── Views/                # Razor View şablonları (HTML/Razor)
-        ├── wwwroot/              # CSS, JavaScript, görseller
-        ├── Program.cs            # Uygulama başlangıç yapılandırması
+        ├── Controllers/           # HTTP isteklerini işleyen controller'lar (C#)
+        ├── Models/               # Veri modelleri (C#)
+        ├── Services/             # İş mantığı ve servisler (C#)
+        ├── Views/                # Razor View şablonları (HTML)
+        ├── wwwroot/              # Statik dosyalar
+        │   ├── css/              # Stil dosyaları (CSS)
+        │   ├── js/               # JavaScript dosyaları (JavaScript)
+        │   └── images/           # Proje görselleri
+        ├── Program.cs            # Uygulama başlangıç yapılandırması (C#)
         ├── appsettings.json      # Yapılandırma dosyası
         └── appsettings.Development.json
 ```
@@ -79,6 +82,58 @@ NetVision/
 | **Veritabanı** | SQL (Design Phase) |
 | **Ağ Protokolleri** | ICMP (Ping), SNMP (planned), TCP/IP |
 | **Simülasyon** | Cisco Packet Tracer |
+
+---
+
+## 📊 Teknoloji Dağılımı
+
+Projenin kod tabanında kullanılan programlama dillerinin dağılımı:
+
+| Dil | Yüzde | Bayt | Klasör |
+|-----|-------|------|--------|
+| 🔷 **HTML** | 42.6% | 78,981 | `NetVision.NetworkManagement/Views/` |
+| 🟦 **C#** | 38.7% | 71,602 | `NetVision.NetworkManagement/Controllers/`, `Models/`, `Services/` |
+| 🟫 **CSS** | 13.3% | 24,585 | `NetVision.NetworkManagement/wwwroot/css/` |
+| 🟨 **JavaScript** | 5.4% | 10,052 | `NetVision.NetworkManagement/wwwroot/js/` |
+
+**Toplam Kod:** ~185 KB
+
+---
+
+## 🚀 Başlarken
+
+### Gereksinimler
+- **.NET 10.0 SDK** veya sonrası
+- **Visual Studio 2022** (Community veya üzeri) VEYA Visual Studio Code
+- **SQL Server** (ileri aşamalar için)
+
+### Kurulum Adımları
+
+1. **Repository'yi klonlayın:**
+   ```bash
+   git clone https://github.com/vrmmm/NetVision.git
+   cd NetVision
+   ```
+
+2. **Proje dizinine gidin:**
+   ```bash
+   cd NetVision.NetworkManagement/NetVision.NetworkManagement
+   ```
+
+3. **Bağımlılıkları yükleyin:**
+   ```bash
+   dotnet restore
+   ```
+
+4. **Uygulamayı çalıştırın:**
+   ```bash
+   dotnet run
+   ```
+
+5. **Tarayıcıda açın:**
+   ```
+   https://localhost:5001
+   ```
 
 ---
 
