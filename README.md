@@ -89,51 +89,12 @@ NetVision/
 
 Projenin kod tabanında kullanılan programlama dillerinin dağılımı:
 
-| Dil | Yüzde | Bayt | Klasör |
-|-----|-------|------|--------|
-| 🔷 **HTML** | 42.6% | 78,981 | `NetVision.NetworkManagement/Views/` |
-| 🟦 **C#** | 38.7% | 71,602 | `NetVision.NetworkManagement/Controllers/`, `Models/`, `Services/` |
-| 🟫 **CSS** | 13.3% | 24,585 | `NetVision.NetworkManagement/wwwroot/css/` |
-| 🟨 **JavaScript** | 5.4% | 10,052 | `NetVision.NetworkManagement/wwwroot/js/` |
-
-**Toplam Kod:** ~185 KB
-
----
-
-## 🚀 Başlarken
-
-### Gereksinimler
-- **.NET 10.0 SDK** veya sonrası
-- **Visual Studio 2022** (Community veya üzeri) VEYA Visual Studio Code
-- **SQL Server** (ileri aşamalar için)
-
-### Kurulum Adımları
-
-1. **Repository'yi klonlayın:**
-   ```bash
-   git clone https://github.com/vrmmm/NetVision.git
-   cd NetVision
-   ```
-
-2. **Proje dizinine gidin:**
-   ```bash
-   cd NetVision.NetworkManagement/NetVision.NetworkManagement
-   ```
-
-3. **Bağımlılıkları yükleyin:**
-   ```bash
-   dotnet restore
-   ```
-
-4. **Uygulamayı çalıştırın:**
-   ```bash
-   dotnet run
-   ```
-
-5. **Tarayıcıda açın:**
-   ```
-   https://localhost:5001
-   ```
+| Dil | Yüzde | Bayt |
+|-----|-------|------|
+| 🔷 **HTML** | 42.6% | 78,981 |
+| 🟦 **C#** | 38.7% | 71,602 | 
+| 🟫 **CSS** | 13.3% | 24,585 | 
+| 🟨 **JavaScript** | 5.4% | 10,052 | 
 
 ---
 
