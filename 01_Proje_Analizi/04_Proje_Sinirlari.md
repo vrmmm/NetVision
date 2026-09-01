@@ -53,8 +53,7 @@ izlenmesi ve yönetilmesi amacıyla geliştirilecektir.
 
 Yazılım bileşenlerinde;
 
-- ASP.NET  
-- Core MVC
+- ASP.NET Core MVC
 - C#
 
 Teknolojilerin kullanılması planlanmaktadır.
