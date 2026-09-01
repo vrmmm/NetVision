@@ -1,6 +1,6 @@
 # 📡 NetVision - Kurumsal Ağ Yönetim Platformu
 
-**NetVision**, Manavgat Belediyesi'nin merkezi ağ altyapısını izlemek, yönetmek ve görselleştirmek için tasarlanmış kapsamlı bir ağ yönetim ve izleme platformudur. Sistem, 8 katlı yönetim merkezinde 145+ kullanıcı ve 263+ ağ cihazını merkezi olarak yönetir.
+**NetVision**, Manavgat Belediyesi'nin merkezi ağ altyapısını izlemek, yönetmek ve görselleştirmek için tasarlanmış kapsamlı bir ağ yönetim ve izleme platformudur. Sistem, 8 katlı yö[...]
 
 ---
 
@@ -278,6 +278,8 @@ Bu proje öğrenme amacıyla geliştirilmektedir. Katkılar için lütfen:
 ## 📞 İletişim
 
 - **Geliştirici:** [@vrmmm](https://github.com/vrmmm)
+- **LinkedIn:** [Evrim Avcı](https://www.linkedin.com/in/evrim-avcı-08b020340?utm_source=share_via&utm_content=profile&utm_medium=member_android)
+- **E-mail:** [evrimmavcii@gmail.com](mailto:evrimmavcii@gmail.com)
 - **Repository:** [github.com/vrmmm/NetVision](https://github.com/vrmmm/NetVision)
 
 ---
