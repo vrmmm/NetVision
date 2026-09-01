@@ -220,21 +220,6 @@ Ağ, aşağıdaki VLAN'lara bölünmüştür:
 - [ ] Otomatik ağ keşfi (Network Discovery)
 - [ ] Port durum izleme
 - [ ] Gelişmiş raporlama ve istatistikler
-- [ ] E-posta bildirimleri
-- [ ] 3D bina görünümü
-- [ ] Grafik tabanlı raporlar
-
----
-
-## 🤝 Katkıda Bulunma
-
-Bu proje öğrenme amacıyla geliştirilmektedir. Katkılar için lütfen:
-
-1. Projeyi fork edin
-2. Feature branch'i oluşturun (`git checkout -b feature/AzaDetay`)
-3. Değişiklikleri commit edin (`git commit -m 'Açıklama ekle'`)
-4. Branch'e push edin (`git push origin feature/AzaDetay`)
-5. Pull Request oluşturun
 
 ---
 
